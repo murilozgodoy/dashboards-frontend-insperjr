@@ -1,73 +1,95 @@
-# React + TypeScript + Vite
+# Frontend InsperJr - Dashboards Kaiserhaus
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend da aplicação de dashboards para análise de dados do restaurante Kaiserhaus, desenvolvido com React, TypeScript e Recharts.
 
-Currently, two official plugins are available:
+## Como executar
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Pré-requisitos
+- **Node.js** (versão 18+)
+- **npm** (vem junto com o Node.js)
+- **Git** (para baixar o projeto)
 
-## React Compiler
+### Passo a passo
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+1. **Instale o Node.js** (se não tiver):
+   - Acesse: https://nodejs.org/
+   - Baixe a versão **LTS** (recomendada)
+   - Execute o instalador
 
-## Expanding the ESLint configuration
+2. **Baixe o projeto:**
+   - Clone o repositório ou baixe o ZIP
+   - Extraia em uma pasta de sua escolha
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+3. **Abra o Terminal/Prompt de Comando:**
+   - **Windows**: Pressione `Win + R`, digite `cmd` e pressione Enter
+   - **Mac**: Pressione `Cmd + Espaço`, digite "Terminal" e pressione Enter
+   - **Linux**: Pressione `Ctrl + Alt + T`
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+4. **Navegue até a pasta do projeto:**
+   ```bash
+   cd caminho/para/dashboards-frontend-insperjr
+   ```
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+5. **Instale as dependências:**
+   ```bash
+   npm install
+   ```
+   *Aguarde terminar (pode demorar alguns minutos na primeira vez)*
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+6. **Execute o projeto:**
+   ```bash
+   npm run dev
+   ```
+
+7. **Abra no navegador:**
+   - **Frontend**: http://localhost:5173
+   - **Backend**: http://localhost:8000 (deve estar rodando)
+
+### Se tudo der certo, você verá:
+- No terminal: `Local: http://localhost:5173/`
+- No navegador: Interface de teste da API com dados do Kaiserhaus
+
+### Problemas comuns:
+- **"npm não é reconhecido"**: Reinstale o Node.js
+- **"porta já está em uso"**: Feche outros programas na porta 5173
+- **"Erro de conexão"**: Verifique se o backend está rodando em http://localhost:8000
+- **"Dados não carregam"**: Confirme que a API está funcionando
+
+## Estrutura
+
+```
+dashboards-frontend-insperjr/
+├── src/
+│   ├── components/        # Componentes React
+│   │   └── ApiTest.tsx   # Componente de teste da API
+│   ├── services/         # Serviços para consumir API
+│   │   └── api.ts        # Serviço principal da API
+│   ├── App.tsx           # Componente principal
+│   └── main.tsx          # Ponto de entrada
+├── package.json          # Dependências do projeto
+└── vite.config.ts        # Configuração do Vite
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Tecnologias
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- **React 19** - Biblioteca para interfaces de usuário
+- **TypeScript** - JavaScript com tipagem estática
+- **Vite** - Build tool moderno e rápido
+- **Recharts** - Biblioteca para gráficos e dashboards
+- **Tailwind CSS** - Framework CSS utilitário
+
+## Funcionalidades
+
+- **Conexão com API**: Consome dados do backend FastAPI
+- **Teste de API**: Interface para verificar status e dados
+- **Preparado para Dashboards**: Estrutura pronta para gráficos com Recharts
+- **Responsivo**: Interface adaptável para diferentes telas
+
+## Documentação
+
+- **React**: https://react.dev/
+- **TypeScript**: https://www.typescriptlang.org/
+- **Vite**: https://vitejs.dev/
+- **Recharts**: https://recharts.org/
+- **Tailwind CSS**: https://tailwindcss.com/
