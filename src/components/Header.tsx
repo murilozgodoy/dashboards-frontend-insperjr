@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
+import { apiService } from '../services/api';
 import styled from 'styled-components';
 import { FiCalendar, FiMenu } from 'react-icons/fi';
 
@@ -17,6 +18,13 @@ const Header: React.FC<HeaderProps> = ({
   onMenuClick,
   sidebarCollapsed = false
 }) => {
+  const [preset, setPreset] = useState<'mes'|'periodo'|'ano'|'diario'>('mes');
+  const [dailyDate, setDailyDate] = useState<string>('');
+  const [monthValue, setMonthValue] = useState<string>(''); // YYYY-MM
+  const [dateBounds, setDateBounds] = useState<{ min: string | null; max: string | null }>({ min: null, max: null });
+  const [periodStart, setPeriodStart] = useState<string>('');
+  const [periodEnd, setPeriodEnd] = useState<string>('');
+
   const getCurrentDate = () => {
     const now = new Date();
     const options: Intl.DateTimeFormatOptions = {
@@ -30,6 +38,59 @@ const Header: React.FC<HeaderProps> = ({
 
   const formatDate = (date: string) => {
     return date.charAt(0).toUpperCase() + date.slice(1);
+  };
+
+  const computeRange = useMemo(() => {
+    const now = new Date();
+    const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    if (preset === 'mes') {
+      const refMonth = monthValue || (dateBounds.max ? dateBounds.max.slice(0,7) : `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`);
+      const [y,m] = refMonth.split('-').map(Number);
+      const start = new Date(y, (m||1)-1, 1);
+      const end = new Date(y, (m||1), 0);
+      return { inicio: start.toISOString().slice(0,10), fim: end.toISOString().slice(0,10), granularidade: 'dia' as const };
+    }
+    if (preset === 'periodo') {
+      const startStr = periodStart || (dateBounds.min ?? new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0,10));
+      const endStr = periodEnd || (dateBounds.max ?? now.toISOString().slice(0,10));
+      return { inicio: startStr, fim: endStr, granularidade: 'dia' as const };
+    }
+    if (preset === 'ano') {
+      const refYear = dateBounds.max ? Number(dateBounds.max.slice(0,4)) : now.getFullYear();
+      const start = new Date(refYear, 0, 1);
+      const end = new Date(refYear, 11, 31);
+      return { inicio: start.toISOString().slice(0,10), fim: end.toISOString().slice(0,10), granularidade: 'mes' as const };
+    }
+    // diário
+    const ref = dailyDate ? new Date(dailyDate + 'T00:00:00') : startOfDay(now);
+    const start = ref;
+    const end = ref;
+    return { inicio: start.toISOString().slice(0,10), fim: end.toISOString().slice(0,10), granularidade: 'dia' as const };
+  }, [preset, dailyDate, monthValue, periodStart, periodEnd, dateBounds.max, dateBounds.min]);
+
+  React.useEffect(() => {
+    // pegar limites do dataset para preencher mês/dia default
+    apiService.getHomeDateBounds()
+      .then((b) => {
+        setDateBounds(b);
+        if (b?.max) {
+          setMonthValue(b.max.slice(0,7));
+          setDailyDate(b.max);
+          setPeriodEnd(b.max);
+        }
+        if (b?.min) setPeriodStart(b.min);
+      })
+      .catch(() => {});
+  }, []);
+
+  const applyRange = () => {
+    const detail = { 
+      mode: preset, 
+      inicio: computeRange.inicio, 
+      fim: computeRange.fim,
+      granularidade: computeRange.granularidade
+    };
+    window.dispatchEvent(new CustomEvent('dateRangeChange', { detail }));
   };
 
   return (
@@ -79,7 +140,54 @@ const Header: React.FC<HeaderProps> = ({
             <CalendarIcon>
               <FiCalendar />
             </CalendarIcon>
-            <DateText>{formatDate(getCurrentDate())}</DateText>
+            <select 
+              value={preset}
+              onChange={(e) => setPreset(e.target.value as any)}
+              style={{ border: '1px solid #e2e8f0', borderRadius: 8, padding: '6px 8px', background: 'white', color: '#334155' }}
+            >
+              <option value="mes">Mês inteiro</option>
+              <option value="periodo">Selecione o período</option>
+              <option value="ano">Este ano</option>
+              <option value="diario">Diário</option>
+            </select>
+            {preset === 'mes' && (
+              <input 
+                type="month" 
+                value={monthValue}
+                onChange={(e) => setMonthValue(e.target.value)}
+                style={{ border: '1px solid #e2e8f0', borderRadius: 8, padding: '6px 8px', background: 'white', color: '#334155' }}
+              />
+            )}
+            {preset === 'periodo' && (
+              <>
+                <input 
+                  type="date" 
+                  value={periodStart}
+                  onChange={(e) => setPeriodStart(e.target.value)}
+                  style={{ border: '1px solid #e2e8f0', borderRadius: 8, padding: '6px 8px', background: 'white', color: '#334155' }}
+                />
+                <input 
+                  type="date" 
+                  value={periodEnd}
+                  onChange={(e) => setPeriodEnd(e.target.value)}
+                  style={{ border: '1px solid #e2e8f0', borderRadius: 8, padding: '6px 8px', background: 'white', color: '#334155' }}
+                />
+              </>
+            )}
+            {preset === 'diario' && (
+              <input 
+                type="date" 
+                value={dailyDate} 
+                onChange={(e) => setDailyDate(e.target.value)}
+                style={{ border: '1px solid #e2e8f0', borderRadius: 8, padding: '6px 8px', background: 'white', color: '#334155' }}
+              />
+            )}
+            <button 
+              onClick={applyRange}
+              style={{ border: '1px solid #3b82f6', color: 'white', background: '#3b82f6', borderRadius: 8, padding: '6px 10px', cursor: 'pointer' }}
+            >
+              Aplicar
+            </button>
           </DateSection>
         )}
 
@@ -172,7 +280,7 @@ const HeaderRight = styled.div`
 const DateSection = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
   padding: 0.75rem 1rem;
   background: #f7fafc;
   border-radius: 12px;

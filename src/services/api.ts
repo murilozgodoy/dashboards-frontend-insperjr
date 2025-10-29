@@ -96,5 +96,11 @@ export const apiService = {
     const response = await fetch(`${API_BASE_URL}/api/home/resumo-mensal${qs.toString() ? `?${qs}` : ''}`);
     if (!response.ok) throw new Error('Erro ao buscar resumo mensal');
     return response.json();
+  },
+
+  async getHomeDateBounds(): Promise<{ min: string | null; max: string | null }> {
+    const response = await fetch(`${API_BASE_URL}/api/home/date-bounds`);
+    if (!response.ok) throw new Error('Erro ao buscar limites de data');
+    return response.json();
   }
 };

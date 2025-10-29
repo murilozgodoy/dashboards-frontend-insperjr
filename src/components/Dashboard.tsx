@@ -17,9 +17,9 @@ import { apiService } from '../services/api';
 const currency = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
 const Dashboard: React.FC = () => {
-  // Default para mostrar dados reais do CSV (dez/2024)
-  const defaultInicio = '2024-12-01';
-  const defaultFim = '2024-12-31';
+  // Será definido dinamicamente a partir do dataset
+  const [defaultInicio, setDefaultInicio] = useState<string | null>(null);
+  const [defaultFim, setDefaultFim] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,11 +33,22 @@ const Dashboard: React.FC = () => {
     async function load() {
       try {
         setLoading(true);
+        // Descobre o mês mais recente do dataset
+        const bounds = await apiService.getHomeDateBounds();
+        const maxDate = bounds.max || new Date().toISOString().slice(0,10);
+        const d = new Date(maxDate + 'T00:00:00');
+        const monthStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+        const inicio = `${monthStr}-01`;
+        const fim = new Date(d.getFullYear(), d.getMonth()+1, 0).toISOString().slice(0,10);
+        if (mounted) {
+          setDefaultInicio(inicio);
+          setDefaultFim(fim);
+        }
         const [k, s, p, r] = await Promise.all([
-          apiService.getHomeKpis({ inicio: defaultInicio, fim: defaultFim }),
-          apiService.getHomeReceitaTempo({ granularidade: 'dia', inicio: defaultInicio, fim: defaultFim }),
-          apiService.getHomePlataformas({ inicio: defaultInicio, fim: defaultFim, metric: 'pedidos' }),
-          apiService.getHomeResumoMensal({ mes: '2024-12' })
+          apiService.getHomeKpis({ inicio, fim }),
+          apiService.getHomeReceitaTempo({ granularidade: 'dia', inicio, fim }),
+          apiService.getHomePlataformas({ inicio, fim, metric: 'pedidos' }),
+          apiService.getHomeResumoMensal({ mes: monthStr })
         ]);
         if (!mounted) return;
         setKpis(k);
@@ -53,6 +64,35 @@ const Dashboard: React.FC = () => {
     }
     load();
     return () => { mounted = false; };
+  }, []);
+
+  useEffect(() => {
+    function onDateRange(e: any) {
+      const { inicio, fim, granularidade } = e.detail || {};
+      if (!inicio || !fim) return;
+      (async () => {
+        try {
+          setLoading(true);
+          const [k, s, p, r] = await Promise.all([
+            apiService.getHomeKpis({ inicio, fim }),
+            apiService.getHomeReceitaTempo({ granularidade: granularidade || 'dia', inicio, fim }),
+            apiService.getHomePlataformas({ inicio, fim, metric: 'pedidos' }),
+            apiService.getHomeResumoMensal({ mes: inicio.slice(0,7) })
+          ]);
+          setKpis(k);
+          setSerie(s.dados);
+          setPlataformas(p.plataformas);
+          setResumo(r);
+          setError(null);
+        } catch (e: any) {
+          setError(e?.message || 'Erro ao carregar dashboard');
+        } finally {
+          setLoading(false);
+        }
+      })();
+    }
+    window.addEventListener('dateRangeChange', onDateRange as any);
+    return () => window.removeEventListener('dateRangeChange', onDateRange as any);
   }, []);
 
   const kpiCards = useMemo(() => {
