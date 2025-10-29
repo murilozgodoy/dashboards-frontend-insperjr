@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import Layout from './Layout';
 import KPICard from './KPICard';
@@ -9,38 +9,81 @@ import {
   FiUsers 
 } from 'react-icons/fi';
 
+import LineChartReceita from './LineChartReceita';
+import DistribuicaoPlataformasChart from './DistribuicaoPlataformasChart';
+import ResumoMensal from './ResumoMensal';
+import { apiService } from '../services/api';
+
+const currency = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+
 const Dashboard: React.FC = () => {
-  //aqqi coloquei dados aleatorios, ja que depois vao ser trocados pelos dados da api
-  const kpiData = [
-    {
-      title: 'Receita Total',
-      value: 'R$ 45.231',
-      change: { value: 12.5, period: 'vs. mês anterior' },
-      icon: <FiDollarSign />,
-      color: 'green' as const
-    },
-    {
-      title: 'Pedidos',
-      value: '1.234',
-      change: { value: 8.2, period: 'neste mês' },
-      icon: <FiShoppingCart />,
-      color: 'blue' as const
-    },
-    {
-      title: 'Ticket Médio',
-      value: 'R$ 36,65',
-      change: { value: -2.4, period: 'por pedido' },
-      icon: <FiTrendingUp />,
-      color: 'orange' as const
-    },
-    {
-      title: 'Clientes',
-      value: '892',
-      change: { value: 5.3, period: 'ativos' },
-      icon: <FiUsers />,
-      color: 'purple' as const
+  // Default para mostrar dados reais do CSV (dez/2024)
+  const defaultInicio = '2024-12-01';
+  const defaultFim = '2024-12-31';
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [kpis, setKpis] = useState<any | null>(null);
+  const [serie, setSerie] = useState<{ periodo: string; receita: number; pedidos: number }[]>([]);
+  const [plataformas, setPlataformas] = useState<{ nome: string; pedidos?: number; receita?: number; pct: number }[]>([]);
+  const [resumo, setResumo] = useState<any | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    async function load() {
+      try {
+        setLoading(true);
+        const [k, s, p, r] = await Promise.all([
+          apiService.getHomeKpis({ inicio: defaultInicio, fim: defaultFim }),
+          apiService.getHomeReceitaTempo({ granularidade: 'dia', inicio: defaultInicio, fim: defaultFim }),
+          apiService.getHomePlataformas({ inicio: defaultInicio, fim: defaultFim, metric: 'pedidos' }),
+          apiService.getHomeResumoMensal({ mes: '2024-12' })
+        ]);
+        if (!mounted) return;
+        setKpis(k);
+        setSerie(s.dados);
+        setPlataformas(p.plataformas);
+        setResumo(r);
+        setError(null);
+      } catch (e: any) {
+        setError(e?.message || 'Erro ao carregar dashboard');
+      } finally {
+        setLoading(false);
+      }
     }
-  ];
+    load();
+    return () => { mounted = false; };
+  }, []);
+
+  const kpiCards = useMemo(() => {
+    if (!kpis) return [] as any[];
+    return [
+      {
+        title: 'Receita Total',
+        value: currency.format(kpis.receita_total || 0),
+        change: { value: Number((kpis.receita_variacao_pct || 0).toFixed(1)), period: 'vs. mês anterior' },
+        icon: <FiDollarSign />, color: 'green' as const
+      },
+      {
+        title: 'Pedidos',
+        value: (kpis.pedidos_totais || 0).toLocaleString('pt-BR'),
+        change: { value: Number((kpis.pedidos_variacao_pct || 0).toFixed(1)), period: 'vs. mês anterior' },
+        icon: <FiShoppingCart />, color: 'blue' as const
+      },
+      {
+        title: 'Ticket Médio',
+        value: currency.format(kpis.ticket_medio || 0),
+        change: { value: Number((kpis.ticket_medio_variacao_pct || 0).toFixed(1)), period: 'vs. mês anterior' },
+        icon: <FiTrendingUp />, color: 'orange' as const
+      },
+      {
+        title: 'Satisfação Média',
+        value: (kpis.satisfacao_media || 0).toFixed(2).replace('.', ','),
+        change: { value: Number(((kpis.satisfacao_taxa_alta || 0) * 100).toFixed(1)), period: 'notas 4-5' },
+        icon: <FiUsers />, color: 'purple' as const
+      }
+    ];
+  }, [kpis]);
 
   return (
     <Layout 
@@ -48,10 +91,11 @@ const Dashboard: React.FC = () => {
       subtitle="Acompanhe as principais métricas do Kaiserhaus"
     >
       <DashboardContainer>
+        {error && <div style={{ color: '#b91c1c', background: '#fee2e2', padding: 12, borderRadius: 8 }}>{error}</div>}
         <KPISection>
           <SectionTitle>Métricas Principais</SectionTitle>
           <KPIGrid>
-            {kpiData.map((kpi, index) => (
+            {kpiCards.map((kpi, index) => (
               <KPICard
                 key={index}
                 title={kpi.title}
@@ -63,6 +107,36 @@ const Dashboard: React.FC = () => {
             ))}
           </KPIGrid>
         </KPISection>
+
+        <SecaoGraficos>
+          <GradeGraficos>
+            <ContainerGrafico>
+              <CabecalhoGrafico>
+                <TituloGrafico>Receita Temporal</TituloGrafico>
+                <SubtituloGrafico>Últimos 30 dias (dez/2024)</SubtituloGrafico>
+              </CabecalhoGrafico>
+              {serie.length ? <LineChartReceita data={serie} /> : <PlaceholderGrafico><TextoPlaceholder>Sem dados</TextoPlaceholder></PlaceholderGrafico>}
+            </ContainerGrafico>
+
+            <ContainerGrafico>
+              <CabecalhoGrafico>
+                <TituloGrafico>Distribuição por Plataforma</TituloGrafico>
+                <SubtituloGrafico>% de pedidos por plataforma</SubtituloGrafico>
+              </CabecalhoGrafico>
+              {plataformas.length ? <DistribuicaoPlataformasChart data={plataformas} mode="pie" /> : <PlaceholderGrafico><TextoPlaceholder>Sem dados</TextoPlaceholder></PlaceholderGrafico>}
+            </ContainerGrafico>
+
+            <ContainerGrafico>
+              <ResumoMensal
+                melhorDia={resumo?.melhor_dia_semana}
+                horarioPico={resumo?.horario_pico}
+                plataformaMaisUsada={resumo?.plataforma_mais_usada}
+                bairroTop={resumo?.bairro_top_receita}
+                mes={resumo?.mes}
+              />
+            </ContainerGrafico>
+          </GradeGraficos>
+        </SecaoGraficos>
       </DashboardContainer>
     </Layout>
   );

@@ -44,12 +44,12 @@ const Sidebar: React.FC<SidebarProps> = ({
   onToggleCollapse
 }) => {
   const menuItems = [
-    { id: 'dashboard', icon: <FiHome />, label: 'Dashboard' },
-    { id: 'vendas', icon: <FiTrendingUp />, label: 'Vendas' },
-    { id: 'pedidos', icon: <FiShoppingCart />, label: 'Pedidos' },
-    { id: 'clientes', icon: <FiUsers />, label: 'Clientes' },
-    { id: 'analises', icon: <FiBarChart />, label: 'Análises' },
-    { id: 'financeiro', icon: <FiDollarSign />, label: 'Financeiro' }
+    { id: 'home', icon: <FiHome />, label: 'Home' },
+    { id: 'temporal', icon: <FiTrendingUp />, label: 'Temporal' },
+    { id: 'geografica', icon: <FiBarChart />, label: 'Geográfica' },
+    { id: 'plataformas', icon: <FiShoppingCart />, label: 'Plataformas' },
+    { id: 'operacional', icon: <FiUsers />, label: 'Operacional' },
+    { id: 'rentabilidade', icon: <FiDollarSign />, label: 'Rentabilidade' }
   ];
 
   return (

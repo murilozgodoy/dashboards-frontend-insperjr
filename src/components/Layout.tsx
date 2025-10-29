@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -16,17 +17,25 @@ const Layout: React.FC<LayoutProps> = ({
   subtitle, 
   showDate = true 
 }) => {
-  const [activeMenuItem, setActiveMenuItem] = useState('dashboard');
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [activeMenuItem, setActiveMenuItem] = useState('home');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
+  useEffect(() => {
+    const path = location.pathname.replace(/^\//, '') || 'home';
+    const key = ['home','temporal','geografica','plataformas','operacional','rentabilidade'].includes(path) ? path : 'home';
+    setActiveMenuItem(key);
+  }, [location.pathname]);
+
   const handleMenuClick = (item: string) => {
     setActiveMenuItem(item);
-    //fechar sidebar no mobile após clicar em um item
+    const path = `/${item}`;
+    navigate(path);
     if (window.innerWidth <= 768) {
       setSidebarOpen(false);
     }
-    console.log(`Navegando para: ${item}`);
   };
 
   const handleMobileMenuClick = () => {
