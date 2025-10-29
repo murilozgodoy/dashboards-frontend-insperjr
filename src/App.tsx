@@ -1,28 +1,10 @@
-import { useState } from 'react'
-function App() {
-  const [count, setCount] = useState(0)
+import ApiTest from './components/ApiTest'
 
+function App() {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-        </a>
-        <a href="https://react.dev" target="_blank">
-        </a>
+    <div className="min-h-screen bg-gray-50">
+      <ApiTest />
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
   )
 }
 
