@@ -102,5 +102,138 @@ export const apiService = {
     const response = await fetch(`${API_BASE_URL}/api/home/date-bounds`);
     if (!response.ok) throw new Error('Erro ao buscar limites de data');
     return response.json();
+  },
+
+  // GEOGRAFIA ENDPOINTS
+  async getGeografiaVolumePorBairro(params?: { inicio?: string; fim?: string; top_n?: number }): Promise<{
+    dados: { bairro: string; volume: number }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    if (params?.top_n) qs.set('top_n', params.top_n.toString());
+    const response = await fetch(`${API_BASE_URL}/api/geografica/volume-por-bairro${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar volume por bairro');
+    return response.json();
+  },
+
+  async getGeografiaReceitaPorBairro(params?: { inicio?: string; fim?: string; top_n?: number }): Promise<{
+    dados: { bairro: string; receita: number }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    if (params?.top_n) qs.set('top_n', params.top_n.toString());
+    const response = await fetch(`${API_BASE_URL}/api/geografica/receita-por-bairro${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar receita por bairro');
+    return response.json();
+  },
+
+  async getGeografiaTicketMedioPorBairro(params?: { inicio?: string; fim?: string; top_n?: number }): Promise<{
+    dados: { bairro: string; ticket_medio: number }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    if (params?.top_n) qs.set('top_n', params.top_n.toString());
+    const response = await fetch(`${API_BASE_URL}/api/geografica/ticket-medio-por-bairro${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar ticket médio por bairro');
+    return response.json();
+  },
+
+  async getGeografiaSatisfacaoPorBairro(params?: { inicio?: string; fim?: string; top_n?: number }): Promise<{
+    dados: { bairro: string; satisfacao: number }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    if (params?.top_n) qs.set('top_n', params.top_n.toString());
+    const response = await fetch(`${API_BASE_URL}/api/geografica/satisfacao-por-bairro${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar satisfação por bairro');
+    return response.json();
+  },
+
+  async getGeografiaDistanciaMediaPorBairro(params?: { inicio?: string; fim?: string; top_n?: number }): Promise<{
+    dados: { bairro: string; distancia_media: number }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    if (params?.top_n) qs.set('top_n', params.top_n.toString());
+    const response = await fetch(`${API_BASE_URL}/api/geografica/distancia-media-por-bairro${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar distância média por bairro');
+    return response.json();
+  },
+
+  async getGeografiaEficienciaPorBairro(params?: { inicio?: string; fim?: string; top_n?: number }): Promise<{
+    dados: { bairro: string; eficiencia: number }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    if (params?.top_n) qs.set('top_n', params.top_n.toString());
+    const response = await fetch(`${API_BASE_URL}/api/geografica/eficiencia-por-bairro${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar eficiência por bairro');
+    return response.json();
+  },
+
+  // ANÁLISE POR DISTÂNCIA
+  async getGeografiaPedidosPorDistancia(params?: { inicio?: string; fim?: string }): Promise<{
+    dados: { faixa: string; pedidos: number }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/geografica/pedidos-por-distancia${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar pedidos por distância');
+    return response.json();
+  },
+
+  async getGeografiaSatisfacaoPorDistancia(params?: { inicio?: string; fim?: string }): Promise<{
+    dados: { faixa: string; satisfacao: number }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/geografica/satisfacao-por-distancia${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar satisfação por distância');
+    return response.json();
+  },
+
+  async getGeografiaValorPorDistancia(params?: { inicio?: string; fim?: string }): Promise<{
+    dados: { faixa: string; valor: number }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/geografica/valor-por-distancia${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar valor por distância');
+    return response.json();
+  },
+
+  // ANÁLISE DE PLATAFORMAS POR BAIRRO
+  async getGeografiaListaBairros(params?: { inicio?: string; fim?: string }): Promise<{
+    bairros: { bairro: string; total_pedidos: number }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/geografica/lista-bairros${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar lista de bairros');
+    return response.json();
+  },
+
+  async getGeografiaPlataformasPorBairro(bairro: string, params?: { inicio?: string; fim?: string }): Promise<{
+    dados: { plataforma: string; pedidos: number; percentual: number }[];
+    bairro: string;
+    total: number;
+  }> {
+    const qs = new URLSearchParams();
+    qs.set('bairro', bairro);
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/geografica/plataformas-por-bairro${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar plataformas por bairro');
+    return response.json();
   }
 };
