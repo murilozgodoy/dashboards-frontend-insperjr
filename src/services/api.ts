@@ -268,28 +268,6 @@ export const apiService = {
     return response.json();
   },
 
-  async getOperacionalTempoEntregaDistancia(params?: { inicio?: string; fim?: string }): Promise<{
-    dados: { faixa: string; tempo_medio: number; quantidade: number }[];
-  }> {
-    const qs = new URLSearchParams();
-    if (params?.inicio) qs.set('inicio', params.inicio);
-    if (params?.fim) qs.set('fim', params.fim);
-    const response = await fetch(`${API_BASE_URL}/api/operacional/tempo-entrega-distancia${qs.toString() ? `?${qs}` : ''}`);
-    if (!response.ok) throw new Error('Erro ao buscar tempo de entrega por distância');
-    return response.json();
-  },
-
-  async getOperacionalEtaVsReal(params?: { inicio?: string; fim?: string }): Promise<{
-    dados: { tipo: string; tempo: number }[];
-  }> {
-    const qs = new URLSearchParams();
-    if (params?.inicio) qs.set('inicio', params.inicio);
-    if (params?.fim) qs.set('fim', params.fim);
-    const response = await fetch(`${API_BASE_URL}/api/operacional/eta-vs-real${qs.toString() ? `?${qs}` : ''}`);
-    if (!response.ok) throw new Error('Erro ao buscar comparação ETA vs Real');
-    return response.json();
-  },
-
   async getOperacionalDistribuicaoTempos(params?: { tipo?: 'preparo'|'entrega'; inicio?: string; fim?: string }): Promise<{
     faixas: { faixa: string; quantidade: number }[];
   }> {
@@ -334,14 +312,65 @@ export const apiService = {
     return response.json();
   },
 
-  async getOperacionalTemposPorModo(params?: { inicio?: string; fim?: string }): Promise<{
-    dados: { modo: string; tempo_preparo_medio: number; tempo_entrega_medio: number; quantidade: number }[];
+  async getOperacionalAnalisePorPeriodo(params?: { inicio?: string; fim?: string }): Promise<{
+    dados: { periodo: string; quantidade: number; tempo_preparo_medio: number; tempo_entrega_medio: number; taxa_atraso_pct: number; precisao_eta_pct: number }[];
   }> {
     const qs = new URLSearchParams();
     if (params?.inicio) qs.set('inicio', params.inicio);
     if (params?.fim) qs.set('fim', params.fim);
-    const response = await fetch(`${API_BASE_URL}/api/operacional/tempos-por-modo${qs.toString() ? `?${qs}` : ''}`);
-    if (!response.ok) throw new Error('Erro ao buscar tempos por modo');
+    const response = await fetch(`${API_BASE_URL}/api/operacional/analise-por-periodo${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar análise por período');
+    return response.json();
+  },
+
+  async getOperacionalEtaVsRealScatter(params?: { inicio?: string; fim?: string; limit?: number }): Promise<{
+    pontos: { eta: number; real: number }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    if (params?.limit !== undefined) qs.set('limit', params.limit.toString());
+    const response = await fetch(`${API_BASE_URL}/api/operacional/eta-vs-real-scatter${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar dados do scatter plot');
+    return response.json();
+  },
+
+  async getOperacionalTemposPorHora(params?: { inicio?: string; fim?: string }): Promise<{
+    dados: { hora: number; tempo_preparo_medio: number; tempo_entrega_medio: number; quantidade: number }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/operacional/tempos-por-hora${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar tempos por hora');
+    return response.json();
+  },
+
+  async getOperacionalEstatisticasTempos(params?: { inicio?: string; fim?: string }): Promise<{
+    preparo: { min: number; max: number; media: number; p50: number; p75: number; p95: number };
+    entrega: { min: number; max: number; media: number; p50: number; p75: number; p95: number };
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/operacional/estatisticas-tempos${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar estatísticas detalhadas');
+    return response.json();
+  },
+
+  async getOperacionalOutliersDetalhados(params?: { inicio?: string; fim?: string; preparo_min?: number; entrega_min?: number; limit?: number }): Promise<{
+    outliers_preparo: any[];
+    outliers_entrega: any[];
+    resumo: { total_pedidos: number; outliers_preparo_count: number; outliers_entrega_count: number; pct_preparo: number; pct_entrega: number };
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    if (params?.preparo_min !== undefined) qs.set('preparo_min', params.preparo_min.toString());
+    if (params?.entrega_min !== undefined) qs.set('entrega_min', params.entrega_min.toString());
+    if (params?.limit !== undefined) qs.set('limit', params.limit.toString());
+    const response = await fetch(`${API_BASE_URL}/api/operacional/outliers-detalhados${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar outliers detalhados');
     return response.json();
   }
 };

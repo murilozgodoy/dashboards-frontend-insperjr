@@ -5,18 +5,18 @@ import KPICard from './KPICard';
 import { apiService } from '../services/api';
 import { 
   FiClock, 
-  FiTruck, 
   FiCheckCircle, 
   FiTrendingUp,
   FiAlertCircle
 } from 'react-icons/fi';
 
 import TempoPreparoTempoChart from './TempoPreparoTempoChart';
-import TempoEntregaDistanciaChart from './TempoEntregaDistanciaChart';
-import EtaVsRealChart from './EtaVsRealChart';
+import EtaVsRealScatterChart from './EtaVsRealScatterChart';
 import DistribuicaoTemposChart from './DistribuicaoTemposChart';
 import PrecisaoEtaHoraChart from './PrecisaoEtaHoraChart';
-import TemposPorModoChart from './TemposPorModoChart';
+import TemposPorHoraChart from './TemposPorHoraChart';
+import EstatisticasDetalhadasCard from './EstatisticasDetalhadasCard';
+import AnalisePorPeriodoChart from './AnalisePorPeriodoChart';
 
 const OperacionalDashboard: React.FC = () => {
   const [defaultInicio, setDefaultInicio] = useState<string | null>(null);
@@ -24,59 +24,71 @@ const OperacionalDashboard: React.FC = () => {
   const [thresholdAtraso, setThresholdAtraso] = useState<number>(10);
   const [thresholdInput, setThresholdInput] = useState<string>('10');
 
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
   const [kpis, setKpis] = useState<any | null>(null);
   const [tempoPreparoTempo, setTempoPreparoTempo] = useState<{ periodo: string; tempo_medio: number }[]>([]);
-  const [tempoEntregaDistancia, setTempoEntregaDistancia] = useState<{ faixa: string; tempo_medio: number; quantidade: number }[]>([]);
-  const [etaVsReal, setEtaVsReal] = useState<{ tipo: string; tempo: number }[]>([]);
+  const [etaVsRealScatter, setEtaVsRealScatter] = useState<{ eta: number; real: number }[]>([]);
   const [distribuicaoPreparo, setDistribuicaoPreparo] = useState<{ faixa: string; quantidade: number }[]>([]);
   const [distribuicaoEntrega, setDistribuicaoEntrega] = useState<{ faixa: string; quantidade: number }[]>([]);
   const [precisaoEtaHora, setPrecisaoEtaHora] = useState<{ hora: number; precisao_pct: number; total_pedidos: number }[]>([]);
-  const [temposPorModo, setTemposPorModo] = useState<{ modo: string; tempo_preparo_medio: number; tempo_entrega_medio: number; quantidade: number }[]>([]);
+  const [analisePorPeriodo, setAnalisePorPeriodo] = useState<{ periodo: string; quantidade: number; tempo_preparo_medio: number; tempo_entrega_medio: number; taxa_atraso_pct: number; precisao_eta_pct: number }[]>([]);
+  const [temposPorHora, setTemposPorHora] = useState<{ hora: number; tempo_preparo_medio: number; tempo_entrega_medio: number; quantidade: number }[]>([]);
+  const [estatisticasTempos, setEstatisticasTempos] = useState<{ preparo: any; entrega: any } | null>(null);
+  const [outliersDetalhados, setOutliersDetalhados] = useState<any | null>(null);
   const [atrasos, setAtrasos] = useState<any[]>([]);
+  const [mostrarTodosPreparo, setMostrarTodosPreparo] = useState(false);
+  const [mostrarTodosEntrega, setMostrarTodosEntrega] = useState(false);
+  const [mostrarTodosAtrasos, setMostrarTodosAtrasos] = useState(false);
+  const LIMITE_INICIAL = 10;
 
   const loadData = async (inicio: string, fim: string, threshold?: number) => {
     const thresholdToUse = threshold !== undefined ? threshold : thresholdAtraso;
     try {
-      setLoading(true);
       const [
         kpisData,
         tempoPreparo,
-        tempoEntrega,
-        etaReal,
+        etaRealScatter,
         distPreparo,
         distEntrega,
         precisaoHora,
-        temposModo,
+        temposHora,
+        analisePeriodo,
+        estatisticas,
+        outliers,
         atrasosData
       ] = await Promise.all([
         apiService.getOperacionalKpis({ inicio, fim, threshold_minutos: thresholdToUse }),
         apiService.getOperacionalTempoPreparoTempo({ granularidade: 'dia', inicio, fim }),
-        apiService.getOperacionalTempoEntregaDistancia({ inicio, fim }),
-        apiService.getOperacionalEtaVsReal({ inicio, fim }),
+        apiService.getOperacionalEtaVsRealScatter({ inicio, fim, limit: 500 }),
         apiService.getOperacionalDistribuicaoTempos({ tipo: 'preparo', inicio, fim }),
         apiService.getOperacionalDistribuicaoTempos({ tipo: 'entrega', inicio, fim }),
         apiService.getOperacionalPrecisaoEtaHora({ inicio, fim }),
-        apiService.getOperacionalTemposPorModo({ inicio, fim }),
+        apiService.getOperacionalTemposPorHora({ inicio, fim }),
+        apiService.getOperacionalAnalisePorPeriodo({ inicio, fim }),
+        apiService.getOperacionalEstatisticasTempos({ inicio, fim }),
+        apiService.getOperacionalOutliersDetalhados({ inicio, fim, preparo_min: 30, entrega_min: 60, limit: 30 }),
         apiService.getOperacionalAtrasos({ threshold_minutos: thresholdToUse, inicio, fim, limit: 20 })
       ]);
 
       setKpis(kpisData);
       setTempoPreparoTempo(tempoPreparo.dados);
-      setTempoEntregaDistancia(tempoEntrega.dados);
-      setEtaVsReal(etaReal.dados);
+      setEtaVsRealScatter(etaRealScatter.pontos);
       setDistribuicaoPreparo(distPreparo.faixas);
       setDistribuicaoEntrega(distEntrega.faixas);
       setPrecisaoEtaHora(precisaoHora.dados);
-      setTemposPorModo(temposModo.dados);
+      setTemposPorHora(temposHora.dados);
+      setAnalisePorPeriodo(analisePeriodo.dados);
+      setEstatisticasTempos(estatisticas);
+      setOutliersDetalhados(outliers);
       setAtrasos(atrasosData.dados);
+      //resetar estados de "ver todos" quando dados mudarem
+      setMostrarTodosPreparo(false);
+      setMostrarTodosEntrega(false);
+      setMostrarTodosAtrasos(false);
       setError(null);
     } catch (e: any) {
       setError(e?.message || 'Erro ao carregar dados operacionais');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -84,7 +96,6 @@ const OperacionalDashboard: React.FC = () => {
     let mounted = true;
     async function init() {
       try {
-        setLoading(true);
         const bounds = await apiService.getHomeDateBounds();
         const maxDate = bounds.max || new Date().toISOString().slice(0,10);
         const d = new Date(maxDate + 'T00:00:00');
@@ -103,8 +114,6 @@ const OperacionalDashboard: React.FC = () => {
         }
       } catch (e: any) {
         setError(e?.message || 'Erro ao carregar dashboard operacional');
-      } finally {
-        setLoading(false);
       }
     }
     init();
@@ -139,28 +148,28 @@ const OperacionalDashboard: React.FC = () => {
       {
         title: 'Pedidos Entregues no Prazo',
         value: `${kpis.precisao_eta_pct?.toFixed(1) || 0}%`,
-        change: undefined, // Não mostra variação, apenas o valor
+        change: undefined,
         icon: <FiCheckCircle />, 
         color: kpis.precisao_eta_pct >= 80 ? 'green' : kpis.precisao_eta_pct >= 60 ? 'orange' : 'red' as const
       },
       {
         title: 'Taxa de Atraso',
         value: `${kpis.taxa_atraso_pct?.toFixed(1) || 0}%`,
-        change: undefined, // Não mostra variação
+        change: undefined,
         icon: <FiAlertCircle />, 
         color: kpis.taxa_atraso_pct < 10 ? 'green' : kpis.taxa_atraso_pct < 20 ? 'orange' : 'red' as const
       },
       {
         title: 'Eficiência Média',
         value: `${kpis.eficiencia_media?.toFixed(2) || 0}`,
-        change: undefined, // Não mostra variação
+        change: undefined,
         icon: <FiTrendingUp />, 
         color: 'blue' as const
       },
       {
         title: 'Desempenho ETA',
         value: `${kpis.desempenho_eta >= 0 ? '+' : ''}${kpis.desempenho_eta?.toFixed(1) || 0}%`,
-        change: undefined, // O próprio valor já indica a variação
+        change: undefined,
         icon: <FiClock />, 
         color: Math.abs(kpis.desempenho_eta) < 5 ? 'green' : Math.abs(kpis.desempenho_eta) < 15 ? 'orange' : 'red' as const
       }
@@ -175,7 +184,6 @@ const OperacionalDashboard: React.FC = () => {
       <DashboardContainer>
         {error && <ErrorMessage>{error}</ErrorMessage>}
         
-        {/* Filtro de Threshold */}
         <FiltroContainer>
           <FiltroLabel>Limite de Atraso (minutos):</FiltroLabel>
           <FiltroInputWrapper>
@@ -197,7 +205,7 @@ const OperacionalDashboard: React.FC = () => {
           </FiltroInputWrapper>
         </FiltroContainer>
 
-        {/* KPIs */}
+        {/*kpis */}
         <KPISection>
           <SectionTitle>Indicadores de Eficiência</SectionTitle>
           <KPIGrid>
@@ -214,9 +222,8 @@ const OperacionalDashboard: React.FC = () => {
           </KPIGrid>
         </KPISection>
 
-        {/* Análise de Tempos */}
         <SecaoGraficos>
-          <SectionTitle>Análise de Tempos</SectionTitle>
+          <SectionTitle>Tempos e Evolução</SectionTitle>
           <GradeGraficos>
             <ContainerGrafico>
               <CabecalhoGrafico>
@@ -232,34 +239,16 @@ const OperacionalDashboard: React.FC = () => {
 
             <ContainerGrafico>
               <CabecalhoGrafico>
-                <TituloGrafico>Tempo de Entrega por Distância</TituloGrafico>
-                <SubtituloGrafico>Tempo médio por faixa de distância</SubtituloGrafico>
+                <TituloGrafico>Tempos por Hora do Dia</TituloGrafico>
+                <SubtituloGrafico>Tempo médio de preparo e entrega por hora</SubtituloGrafico>
               </CabecalhoGrafico>
-              {tempoEntregaDistancia.length ? (
-                <TempoEntregaDistanciaChart data={tempoEntregaDistancia} />
+              {temposPorHora.length ? (
+                <TemposPorHoraChart data={temposPorHora} />
               ) : (
                 <PlaceholderGrafico><TextoPlaceholder>Sem dados</TextoPlaceholder></PlaceholderGrafico>
               )}
             </ContainerGrafico>
 
-            <ContainerGrafico>
-              <CabecalhoGrafico>
-                <TituloGrafico>Comparação ETA vs Tempo Real</TituloGrafico>
-                <SubtituloGrafico>ETA estimado versus tempo real de entrega</SubtituloGrafico>
-              </CabecalhoGrafico>
-              {etaVsReal.length ? (
-                <EtaVsRealChart data={etaVsReal} />
-              ) : (
-                <PlaceholderGrafico><TextoPlaceholder>Sem dados</TextoPlaceholder></PlaceholderGrafico>
-              )}
-            </ContainerGrafico>
-          </GradeGraficos>
-        </SecaoGraficos>
-
-        {/* Distribuição de Tempos */}
-        <SecaoGraficos>
-          <SectionTitle>Distribuição de Tempos</SectionTitle>
-          <GradeGraficos>
             <ContainerGrafico>
               <CabecalhoGrafico>
                 <TituloGrafico>Distribuição de Tempos de Preparo</TituloGrafico>
@@ -286,10 +275,48 @@ const OperacionalDashboard: React.FC = () => {
           </GradeGraficos>
         </SecaoGraficos>
 
-        {/* Precisão e Modos */}
+        {/*estatisticas deatalhadas */}
+        {estatisticasTempos && (
+          <SecaoGraficos>
+            <ContainerGrafico>
+              <EstatisticasDetalhadasCard 
+                preparo={estatisticasTempos.preparo}
+                entrega={estatisticasTempos.entrega}
+              />
+            </ContainerGrafico>
+          </SecaoGraficos>
+        )}
+
+        {/* Precisão do ETA */}
         <SecaoGraficos>
-          <SectionTitle>Precisão e Análise por Modo</SectionTitle>
+          <SectionTitle>Precisão do ETA</SectionTitle>
           <GradeGraficos>
+            <ContainerGrafico>
+              <CabecalhoGrafico>
+                <TituloGrafico>Scatter Plot: ETA vs Tempo Real</TituloGrafico>
+                <SubtituloGrafico>Comparação visual entre ETA estimado e tempo real de entrega</SubtituloGrafico>
+                <LegendaCores>
+                  <LegendaItem>
+                    <LegendaCor $cor="#10b981" />
+                    <span>Verde: Diferença ≤ 5 min (preciso)</span>
+                  </LegendaItem>
+                  <LegendaItem>
+                    <LegendaCor $cor="#ef4444" />
+                    <span>Vermelho: Atrasado (&gt; 5 min)</span>
+                  </LegendaItem>
+                  <LegendaItem>
+                    <LegendaCor $cor="#3b82f6" />
+                    <span>Azul: Antecipado (&lt; -5 min)</span>
+                  </LegendaItem>
+                </LegendaCores>
+              </CabecalhoGrafico>
+              {etaVsRealScatter.length ? (
+                <EtaVsRealScatterChart data={etaVsRealScatter} />
+              ) : (
+                <PlaceholderGrafico><TextoPlaceholder>Sem dados</TextoPlaceholder></PlaceholderGrafico>
+              )}
+            </ContainerGrafico>
+
             <ContainerGrafico>
               <CabecalhoGrafico>
                 <TituloGrafico>Precisão do ETA por Hora do Dia</TituloGrafico>
@@ -301,14 +328,19 @@ const OperacionalDashboard: React.FC = () => {
                 <PlaceholderGrafico><TextoPlaceholder>Sem dados</TextoPlaceholder></PlaceholderGrafico>
               )}
             </ContainerGrafico>
+          </GradeGraficos>
+        </SecaoGraficos>
 
+        <SecaoGraficos>
+          <SectionTitle>Análise por Período do Dia</SectionTitle>
+          <GradeGraficos>
             <ContainerGrafico>
               <CabecalhoGrafico>
-                <TituloGrafico>Tempos por Modo de Pedido</TituloGrafico>
-                <SubtituloGrafico>Tempo médio de preparo e entrega por modo</SubtituloGrafico>
+                <TituloGrafico>Análise Operacional por Período</TituloGrafico>
+                <SubtituloGrafico>Métricas de tempos, volume, atrasos e precisão por período do dia</SubtituloGrafico>
               </CabecalhoGrafico>
-              {temposPorModo.length ? (
-                <TemposPorModoChart data={temposPorModo} />
+              {analisePorPeriodo.length > 0 ? (
+                <AnalisePorPeriodoChart data={analisePorPeriodo} />
               ) : (
                 <PlaceholderGrafico><TextoPlaceholder>Sem dados</TextoPlaceholder></PlaceholderGrafico>
               )}
@@ -316,10 +348,135 @@ const OperacionalDashboard: React.FC = () => {
           </GradeGraficos>
         </SecaoGraficos>
 
+        {/*outliers */}
+        {outliersDetalhados && (outliersDetalhados.outliers_preparo.length > 0 || outliersDetalhados.outliers_entrega.length > 0) && (
+          <SecaoGraficos>
+            <SectionTitle>Análise de Outliers</SectionTitle>
+            
+            {outliersDetalhados.resumo && (
+              <ResumoOutliers>
+                <ResumoItem>
+                  <ResumoLabel>Preparo &gt; 30 min:</ResumoLabel>
+                  <ResumoValue>{outliersDetalhados.resumo.outliers_preparo_count} ({outliersDetalhados.resumo.pct_preparo.toFixed(1)}%)</ResumoValue>
+                </ResumoItem>
+                <ResumoItem>
+                  <ResumoLabel>Entrega &gt; 60 min:</ResumoLabel>
+                  <ResumoValue>{outliersDetalhados.resumo.outliers_entrega_count} ({outliersDetalhados.resumo.pct_entrega.toFixed(1)}%)</ResumoValue>
+                </ResumoItem>
+              </ResumoOutliers>
+            )}
+
+            {outliersDetalhados.outliers_preparo.length > 0 && (
+              <TabelaContainer style={{ marginBottom: '1.5rem' }}>
+                <TabelaTitle>
+                  Top Pedidos com Preparo &gt; 30 minutos
+                  {outliersDetalhados.outliers_preparo.length > LIMITE_INICIAL && (
+                    <ContadorTabela>
+                      ({mostrarTodosPreparo ? outliersDetalhados.outliers_preparo.length : LIMITE_INICIAL} de {outliersDetalhados.outliers_preparo.length})
+                    </ContadorTabela>
+                  )}
+                </TabelaTitle>
+                <Tabela>
+                  <thead>
+                    <Tr>
+                      <Th>Data/Hora</Th>
+                      <Th>Preparo (min)</Th>
+                      <Th>Entrega (min)</Th>
+                      <Th>Distância (km)</Th>
+                      <Th>Hora</Th>
+                      <Th>Bairro</Th>
+                      <Th>Plataforma</Th>
+                      <Th>Modo</Th>
+                    </Tr>
+                  </thead>
+                  <tbody>
+                    {(mostrarTodosPreparo 
+                      ? outliersDetalhados.outliers_preparo 
+                      : outliersDetalhados.outliers_preparo.slice(0, LIMITE_INICIAL)
+                    ).map((outlier: any, index: number) => (
+                      <Tr key={index}>
+                        <Td>{outlier.data ? new Date(outlier.data).toLocaleString('pt-BR') : '-'}</Td>
+                        <Td $isAtraso={true}>{outlier.tempo_preparo.toFixed(0)}</Td>
+                        <Td>{outlier.tempo_entrega.toFixed(0)}</Td>
+                        <Td>{outlier.distancia_km.toFixed(1)}</Td>
+                        <Td>{outlier.hora !== null ? `${outlier.hora}:00` : '-'}</Td>
+                        <Td>{outlier.bairro || '-'}</Td>
+                        <Td>{outlier.platform || '-'}</Td>
+                        <Td>{outlier.modo || '-'}</Td>
+                      </Tr>
+                    ))}
+                  </tbody>
+                </Tabela>
+                {outliersDetalhados.outliers_preparo.length > LIMITE_INICIAL && (
+                  <BotaoVerMais onClick={() => setMostrarTodosPreparo(!mostrarTodosPreparo)}>
+                    {mostrarTodosPreparo ? 'Ver menos' : `Ver todos (${outliersDetalhados.outliers_preparo.length})`}
+                  </BotaoVerMais>
+                )}
+              </TabelaContainer>
+            )}
+
+            {outliersDetalhados.outliers_entrega.length > 0 && (
+              <TabelaContainer>
+                <TabelaTitle>
+                  Top Pedidos com Entrega &gt; 60 minutos
+                  {outliersDetalhados.outliers_entrega.length > LIMITE_INICIAL && (
+                    <ContadorTabela>
+                      ({mostrarTodosEntrega ? outliersDetalhados.outliers_entrega.length : LIMITE_INICIAL} de {outliersDetalhados.outliers_entrega.length})
+                    </ContadorTabela>
+                  )}
+                </TabelaTitle>
+                <Tabela>
+                  <thead>
+                    <Tr>
+                      <Th>Data/Hora</Th>
+                      <Th>Preparo (min)</Th>
+                      <Th>Entrega (min)</Th>
+                      <Th>Distância (km)</Th>
+                      <Th>Hora</Th>
+                      <Th>Bairro</Th>
+                      <Th>Plataforma</Th>
+                      <Th>Modo</Th>
+                    </Tr>
+                  </thead>
+                  <tbody>
+                    {(mostrarTodosEntrega 
+                      ? outliersDetalhados.outliers_entrega 
+                      : outliersDetalhados.outliers_entrega.slice(0, LIMITE_INICIAL)
+                    ).map((outlier: any, index: number) => (
+                      <Tr key={index}>
+                        <Td>{outlier.data ? new Date(outlier.data).toLocaleString('pt-BR') : '-'}</Td>
+                        <Td>{outlier.tempo_preparo.toFixed(0)}</Td>
+                        <Td $isAtraso={true}>{outlier.tempo_entrega.toFixed(0)}</Td>
+                        <Td>{outlier.distancia_km.toFixed(1)}</Td>
+                        <Td>{outlier.hora !== null ? `${outlier.hora}:00` : '-'}</Td>
+                        <Td>{outlier.bairro || '-'}</Td>
+                        <Td>{outlier.platform || '-'}</Td>
+                        <Td>{outlier.modo || '-'}</Td>
+                      </Tr>
+                    ))}
+                  </tbody>
+                </Tabela>
+                {outliersDetalhados.outliers_entrega.length > LIMITE_INICIAL && (
+                  <BotaoVerMais onClick={() => setMostrarTodosEntrega(!mostrarTodosEntrega)}>
+                    {mostrarTodosEntrega ? 'Ver menos' : `Ver todos (${outliersDetalhados.outliers_entrega.length})`}
+                  </BotaoVerMais>
+                )}
+              </TabelaContainer>
+            )}
+          </SecaoGraficos>
+        )}
+
         {/* Tabela de Atrasos */}
         {atrasos.length > 0 && (
           <SecaoGraficos>
-            <SectionTitle>Pedidos com Atraso &gt; {thresholdAtraso} minutos</SectionTitle>
+            <SectionTitle>
+              Pedidos com Atraso &gt; {thresholdAtraso} minutos
+              {atrasos.length > LIMITE_INICIAL && (
+                <ContadorTabela style={{ marginLeft: '0.5rem' }}>
+                  ({mostrarTodosAtrasos ? atrasos.length : LIMITE_INICIAL} de {atrasos.length})
+                </ContadorTabela>
+              )}
+            </SectionTitle>
             <TabelaContainer>
               <Tabela>
                 <thead>
@@ -334,7 +491,7 @@ const OperacionalDashboard: React.FC = () => {
                   </Tr>
                 </thead>
                 <tbody>
-                  {atrasos.map((atraso, index) => (
+                  {(mostrarTodosAtrasos ? atrasos : atrasos.slice(0, LIMITE_INICIAL)).map((atraso, index) => (
                     <Tr key={index}>
                       <Td>{atraso.data ? new Date(atraso.data).toLocaleDateString('pt-BR') : '-'}</Td>
                       <Td>{atraso.nome_cliente || '-'}</Td>
@@ -347,6 +504,11 @@ const OperacionalDashboard: React.FC = () => {
                   ))}
                 </tbody>
               </Tabela>
+              {atrasos.length > LIMITE_INICIAL && (
+                <BotaoVerMais onClick={() => setMostrarTodosAtrasos(!mostrarTodosAtrasos)}>
+                  {mostrarTodosAtrasos ? 'Ver menos' : `Ver todos (${atrasos.length})`}
+                </BotaoVerMais>
+              )}
             </TabelaContainer>
           </SecaoGraficos>
         )}
@@ -519,6 +681,30 @@ const SubtituloGrafico = styled.p`
   margin: 0;
 `;
 
+const LegendaCores = styled.div`
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #e2e8f0;
+`;
+
+const LegendaItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: #4a5568;
+`;
+
+const LegendaCor = styled.div<{ $cor: string }>`
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: ${props => props.$cor};
+`;
+
 const PlaceholderGrafico = styled.div`
   display: flex;
   align-items: center;
@@ -537,6 +723,34 @@ const TextoPlaceholder = styled.p`
   margin: 0;
 `;
 
+const ResumoOutliers = styled.div`
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #fef3c7;
+  border-radius: 12px;
+  border: 1px solid #fcd34d;
+`;
+
+const ResumoItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+`;
+
+const ResumoLabel = styled.span`
+  font-size: 0.875rem;
+  color: #92400e;
+  font-weight: 600;
+`;
+
+const ResumoValue = styled.span`
+  font-size: 1.125rem;
+  color: #78350f;
+  font-weight: 700;
+`;
+
 const TabelaContainer = styled.div`
   background: white;
   border-radius: 16px;
@@ -544,6 +758,39 @@ const TabelaContainer = styled.div`
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   border: 1px solid #e2e8f0;
   overflow-x: auto;
+`;
+
+const TabelaTitle = styled.h4`
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a202c;
+  margin: 0 0 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const ContadorTabela = styled.span`
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #718096;
+`;
+
+const BotaoVerMais = styled.button`
+  margin-top: 1rem;
+  padding: 0;
+  background: none;
+  border: none;
+  color: #1D311F;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.2s;
+
+  &:hover {
+    color: #2d4630;
+  }
 `;
 
 const Tabela = styled.table`
