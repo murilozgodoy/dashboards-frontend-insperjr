@@ -235,5 +235,113 @@ export const apiService = {
     const response = await fetch(`${API_BASE_URL}/api/geografica/plataformas-por-bairro${qs.toString() ? `?${qs}` : ''}`);
     if (!response.ok) throw new Error('Erro ao buscar plataformas por bairro');
     return response.json();
+  },
+
+  //endpoints operacional
+  async getOperacionalKpis(params?: { inicio?: string; fim?: string; threshold_minutos?: number }): Promise<{
+    tempo_preparo_medio: number;
+    tempo_entrega_medio: number;
+    precisao_eta_pct: number;
+    taxa_atraso_pct: number;
+    eficiencia_media: number;
+    desempenho_eta: number;
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    if (params?.threshold_minutos !== undefined) qs.set('threshold_minutos', params.threshold_minutos.toString());
+    const response = await fetch(`${API_BASE_URL}/api/operacional/kpis${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar KPIs operacionais');
+    return response.json();
+  },
+
+  async getOperacionalTempoPreparoTempo(params?: { granularidade?: 'dia'|'semana'|'mes'; inicio?: string; fim?: string }): Promise<{
+    granularidade: 'dia'|'semana'|'mes';
+    dados: { periodo: string; tempo_medio: number }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.granularidade) qs.set('granularidade', params.granularidade);
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/operacional/tempo-preparo-tempo${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar tempo de preparo temporal');
+    return response.json();
+  },
+
+  async getOperacionalTempoEntregaDistancia(params?: { inicio?: string; fim?: string }): Promise<{
+    dados: { faixa: string; tempo_medio: number; quantidade: number }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/operacional/tempo-entrega-distancia${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar tempo de entrega por distância');
+    return response.json();
+  },
+
+  async getOperacionalEtaVsReal(params?: { inicio?: string; fim?: string }): Promise<{
+    dados: { tipo: string; tempo: number }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/operacional/eta-vs-real${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar comparação ETA vs Real');
+    return response.json();
+  },
+
+  async getOperacionalDistribuicaoTempos(params?: { tipo?: 'preparo'|'entrega'; inicio?: string; fim?: string }): Promise<{
+    faixas: { faixa: string; quantidade: number }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.tipo) qs.set('tipo', params.tipo);
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/operacional/distribuicao-tempos${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar distribuição de tempos');
+    return response.json();
+  },
+
+  async getOperacionalAtrasos(params?: { threshold_minutos?: number; inicio?: string; fim?: string; limit?: number }): Promise<{
+    dados: {
+      data: string | null;
+      nome_cliente: string;
+      eta_minutos: number;
+      tempo_real_minutos: number;
+      atraso_minutos: number;
+      distancia_km: number;
+      platform: string;
+    }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.threshold_minutos !== undefined) qs.set('threshold_minutos', params.threshold_minutos.toString());
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    if (params?.limit !== undefined) qs.set('limit', params.limit.toString());
+    const response = await fetch(`${API_BASE_URL}/api/operacional/atrasos${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar atrasos');
+    return response.json();
+  },
+
+  async getOperacionalPrecisaoEtaHora(params?: { inicio?: string; fim?: string }): Promise<{
+    dados: { hora: number; precisao_pct: number; total_pedidos: number }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/operacional/precisao-eta-hora${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar precisão ETA por hora');
+    return response.json();
+  },
+
+  async getOperacionalTemposPorModo(params?: { inicio?: string; fim?: string }): Promise<{
+    dados: { modo: string; tempo_preparo_medio: number; tempo_entrega_medio: number; quantidade: number }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/operacional/tempos-por-modo${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar tempos por modo');
+    return response.json();
   }
 };
