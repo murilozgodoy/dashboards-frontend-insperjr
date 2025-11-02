@@ -1,5 +1,6 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { CHART_COLORS } from '../config/colors';
 
 interface Item {
   dia_semana: string;
@@ -31,7 +32,7 @@ const TendenciasDiariasChart: React.FC<Props> = ({ data }) => {
           }}
         />
         <Legend />
-        <Bar dataKey="media_pedidos" name="Média de Pedidos" fill="#3b82f6" />
+        <Bar dataKey="media_pedidos" name="Média de Pedidos" fill={CHART_COLORS.azul} />
       </BarChart>
     </ResponsiveContainer>
   );

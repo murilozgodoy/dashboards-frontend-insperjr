@@ -1,5 +1,6 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { CHART_COLORS } from '../config/colors';
 
 interface Item {
   hora: number;
@@ -31,7 +32,7 @@ const HorarioPicoChart: React.FC<Props> = ({ data }) => {
         <YAxis label={{ value: 'Pedidos', angle: -90, position: 'insideLeft' }} />
         <Tooltip formatter={(v: any) => `${v.toLocaleString('pt-BR')} pedidos`} />
         <Legend />
-        <Bar dataKey="quantidade" name="Pedidos" fill="#3b82f6" />
+        <Bar dataKey="quantidade" name="Pedidos" fill={CHART_COLORS.azul} />
       </BarChart>
     </ResponsiveContainer>
   );

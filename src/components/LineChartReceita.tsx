@@ -1,5 +1,6 @@
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { CHART_COLORS } from '../config/colors';
 
 type Ponto = { periodo: string; receita: number; pedidos: number };
 
@@ -19,8 +20,8 @@ const LineChartReceita: React.FC<Props> = ({ data }) => {
         <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 12 }} />
         <Tooltip formatter={(v: any, n: any) => (n === 'receita' ? currency.format(v as number) : v)} />
         <Legend />
-        <Line type="monotone" yAxisId="left" dataKey="receita" stroke="#22c55e" name="Receita" strokeWidth={2} dot={false} />
-        <Line type="monotone" yAxisId="right" dataKey="pedidos" stroke="#3b82f6" name="Pedidos" strokeWidth={2} dot={false} />
+        <Line type="monotone" yAxisId="left" dataKey="receita" stroke={CHART_COLORS.amarelo} name="Receita" strokeWidth={2} dot={false} />
+        <Line type="monotone" yAxisId="right" dataKey="pedidos" stroke={CHART_COLORS.marrom} name="Pedidos" strokeWidth={2} dot={false} />
       </LineChart>
     </ResponsiveContainer>
   );

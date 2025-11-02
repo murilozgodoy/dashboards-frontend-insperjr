@@ -1,12 +1,12 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { getChartColor } from '../config/colors';
 
 interface SatisfacaoPorBairroChartProps {
   data: { bairro: string; satisfacao: number }[];
 }
 
 const SatisfacaoPorBairroChart: React.FC<SatisfacaoPorBairroChartProps> = ({ data }) => {
-  const COLORS = ['#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe', '#ede9fe'];
   
   return (
     <ResponsiveContainer width="100%" height={400}>
@@ -37,7 +37,7 @@ const SatisfacaoPorBairroChart: React.FC<SatisfacaoPorBairroChartProps> = ({ dat
         />
         <Bar dataKey="satisfacao" radius={[8, 8, 0, 0]}>
           {data.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            <Cell key={`cell-${index}`} fill={getChartColor(index)} />
           ))}
         </Bar>
       </BarChart>

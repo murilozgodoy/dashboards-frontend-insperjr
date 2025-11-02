@@ -1,5 +1,6 @@
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { CHART_COLORS } from '../config/colors';
 
 interface DadosTemporais {
   periodo: string;
@@ -39,7 +40,7 @@ const EvolucaoTemporalRentabilidadeChart: React.FC<Props> = ({ data }) => {
           type="monotone" 
           yAxisId="left" 
           dataKey="receita_bruta" 
-          stroke="#22c55e" 
+          stroke={CHART_COLORS.amarelo} 
           name="Receita Bruta" 
           strokeWidth={2} 
           dot={false} 
@@ -48,7 +49,7 @@ const EvolucaoTemporalRentabilidadeChart: React.FC<Props> = ({ data }) => {
           type="monotone" 
           yAxisId="left" 
           dataKey="comissoes" 
-          stroke="#ef4444" 
+          stroke={CHART_COLORS.marrom} 
           name="Comissões" 
           strokeWidth={2} 
           dot={false} 
@@ -57,7 +58,7 @@ const EvolucaoTemporalRentabilidadeChart: React.FC<Props> = ({ data }) => {
           type="monotone" 
           yAxisId="left" 
           dataKey="receita_liquida" 
-          stroke="#3b82f6" 
+          stroke={CHART_COLORS.amarelo} 
           name="Receita Líquida" 
           strokeWidth={2} 
           dot={false} 
@@ -66,7 +67,7 @@ const EvolucaoTemporalRentabilidadeChart: React.FC<Props> = ({ data }) => {
           type="monotone" 
           yAxisId="right" 
           dataKey="margem_pct" 
-          stroke="#f59e0b" 
+          stroke={CHART_COLORS.marrom} 
           name="Margem %" 
           strokeWidth={2} 
           dot={false} 

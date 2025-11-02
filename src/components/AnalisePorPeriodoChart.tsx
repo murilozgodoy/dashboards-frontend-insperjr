@@ -1,5 +1,6 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Cell } from 'recharts';
+import { CHART_COLORS } from '../config/colors';
 
 interface AnalisePorPeriodoChartProps {
   data: { 
@@ -13,10 +14,10 @@ interface AnalisePorPeriodoChartProps {
 }
 
 const COLORS = {
-  preparo: '#3b82f6',
-  entrega: '#10b981',
-  atraso: '#ef4444',
-  precisao: '#8b5cf6'
+  preparo: CHART_COLORS.azul,
+  entrega: CHART_COLORS.amarelo,
+  atraso: CHART_COLORS.vermelho,
+  precisao: CHART_COLORS.marrom
 };
 
 const AnalisePorPeriodoChart: React.FC<AnalisePorPeriodoChartProps> = ({ data }) => {

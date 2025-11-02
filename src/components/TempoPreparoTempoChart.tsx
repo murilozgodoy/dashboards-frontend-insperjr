@@ -1,5 +1,6 @@
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { CHART_COLORS } from '../config/colors';
 
 interface TempoPreparoTempoChartProps {
   data: { periodo: string; tempo_medio: number }[];
@@ -34,7 +35,7 @@ const TempoPreparoTempoChart: React.FC<TempoPreparoTempoChartProps> = ({ data })
         <Line 
           type="monotone" 
           dataKey="tempo_medio" 
-          stroke="#3b82f6" 
+          stroke={CHART_COLORS.marrom} 
           strokeWidth={3}
           name="Tempo Médio"
           dot={{ r: 4 }}

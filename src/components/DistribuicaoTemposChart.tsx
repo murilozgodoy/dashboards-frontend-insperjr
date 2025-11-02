@@ -1,11 +1,10 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { getChartColor } from '../config/colors';
 
 interface DistribuicaoTemposChartProps {
   data: { faixa: string; quantidade: number }[];
 }
-
-const COLORS = ['#f59e0b', '#fbbf24', '#fcd34d', '#fde68a', '#fef3c7'];
 
 const DistribuicaoTemposChart: React.FC<DistribuicaoTemposChartProps> = ({ data }) => {
   return (
@@ -33,7 +32,7 @@ const DistribuicaoTemposChart: React.FC<DistribuicaoTemposChartProps> = ({ data 
         />
         <Bar dataKey="quantidade" name="Pedidos" radius={[8, 8, 0, 0]}>
           {data.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            <Cell key={`cell-${index}`} fill={getChartColor(index)} />
           ))}
         </Bar>
       </BarChart>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Cell } from 'recharts';
+import { CHART_COLORS } from '../config/colors';
 
 interface TipoData {
   tipo: string;
@@ -15,8 +16,6 @@ interface Props {
 }
 
 const currency = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
-
-const COLORS = ['#3b82f6', '#22c55e', '#f59e0b', '#8b5cf6'];
 
 const RentabilidadePorTipoChart: React.FC<Props> = ({ data }) => {
   return (
@@ -39,11 +38,11 @@ const RentabilidadePorTipoChart: React.FC<Props> = ({ data }) => {
           labelFormatter={(label) => `Tipo: ${label}`}
         />
         <Legend />
-        <Bar yAxisId="left" dataKey="receita_bruta" name="Receita Bruta" fill="#3b82f6" />
-        <Bar yAxisId="left" dataKey="receita_liquida" name="Receita Líquida" fill="#22c55e" />
-        <Bar yAxisId="right" dataKey="margem_pct" name="Margem %" fill="#f59e0b">
+        <Bar yAxisId="left" dataKey="receita_bruta" name="Receita Bruta" fill={CHART_COLORS.azul} />
+        <Bar yAxisId="left" dataKey="receita_liquida" name="Receita Líquida" fill={CHART_COLORS.vermelho} />
+        <Bar yAxisId="right" dataKey="margem_pct" name="Margem %" fill={CHART_COLORS.amarelo}>
           {data.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill="#f59e0b" />
+            <Cell key={`cell-${index}`} fill={CHART_COLORS.amarelo} />
           ))}
         </Bar>
       </BarChart>

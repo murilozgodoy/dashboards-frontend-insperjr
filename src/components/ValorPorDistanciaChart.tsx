@@ -1,12 +1,12 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { getChartColor } from '../config/colors';
 
 interface ValorPorDistanciaChartProps {
   data: { faixa: string; valor: number }[];
 }
 
 const ValorPorDistanciaChart: React.FC<ValorPorDistanciaChartProps> = ({ data }) => {
-  const COLORS = ['#10b981', '#34d399', '#6ee7b7', '#a7f3d0', '#d1fae5'];
   
   const currency = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
   
@@ -33,7 +33,7 @@ const ValorPorDistanciaChart: React.FC<ValorPorDistanciaChartProps> = ({ data })
         />
         <Bar dataKey="valor" radius={[8, 8, 0, 0]}>
           {data.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            <Cell key={`cell-${index}`} fill={getChartColor(index)} />
           ))}
         </Bar>
       </BarChart>

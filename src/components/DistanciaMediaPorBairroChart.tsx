@@ -1,12 +1,12 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { getChartColor } from '../config/colors';
 
 interface DistanciaMediaPorBairroChartProps {
   data: { bairro: string; distancia_media: number }[];
 }
 
 const DistanciaMediaPorBairroChart: React.FC<DistanciaMediaPorBairroChartProps> = ({ data }) => {
-  const COLORS = ['#ef4444', '#f87171', '#fca5a5', '#fecaca', '#fee2e2'];
   
   return (
     <ResponsiveContainer width="100%" height={400}>
@@ -34,7 +34,7 @@ const DistanciaMediaPorBairroChart: React.FC<DistanciaMediaPorBairroChartProps> 
         />
         <Bar dataKey="distancia_media" radius={[8, 8, 0, 0]}>
           {data.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            <Cell key={`cell-${index}`} fill={getChartColor(index)} />
           ))}
         </Bar>
       </BarChart>

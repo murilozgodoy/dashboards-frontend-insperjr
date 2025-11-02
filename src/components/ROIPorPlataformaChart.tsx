@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { getChartColor } from '../config/colors';
 
 interface PlataformaROI {
   plataforma: string;
@@ -15,8 +16,6 @@ interface Props {
 }
 
 const currency = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
-
-const COLORS = ['#22c55e', '#3b82f6', '#f59e0b', '#8b5cf6', '#ef4444'];
 
 const ROIPorPlataformaChart: React.FC<Props> = ({ data }) => {
   const sortedData = [...data].sort((a, b) => b.roi_pct - a.roi_pct);
@@ -39,7 +38,7 @@ const ROIPorPlataformaChart: React.FC<Props> = ({ data }) => {
             <Tooltip formatter={(value: any) => `${value.toFixed(2)}%`} />
             <Bar dataKey="roi_pct" name="ROI %">
               {sortedData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                <Cell key={`cell-${index}`} fill={getChartColor(index)} />
               ))}
             </Bar>
           </BarChart>

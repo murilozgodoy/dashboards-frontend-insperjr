@@ -1,5 +1,6 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
+import { PERIODO_DIA_COLORS } from '../config/colors';
 
 interface Item {
   periodo: string;
@@ -9,13 +10,6 @@ interface Item {
 interface Props {
   data: Item[];
 }
-
-const COLORS = {
-  'Madrugada': '#1e293b',
-  'Manhã': '#3b82f6',
-  'Tarde': '#f59e0b',
-  'Noite': '#8b5cf6'
-};
 
 const PeriodoDiaChart: React.FC<Props> = ({ data }) => {
   return (
@@ -28,7 +22,7 @@ const PeriodoDiaChart: React.FC<Props> = ({ data }) => {
         <Legend />
         <Bar dataKey="quantidade" name="Pedidos">
           {data.map((entry, idx) => (
-            <Cell key={idx} fill={COLORS[entry.periodo as keyof typeof COLORS] || '#94a3b8'} />
+            <Cell key={idx} fill={PERIODO_DIA_COLORS[entry.periodo as keyof typeof PERIODO_DIA_COLORS] || '#94a3b8'} />
           ))}
         </Bar>
       </BarChart>
