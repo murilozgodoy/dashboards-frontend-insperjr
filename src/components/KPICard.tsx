@@ -11,6 +11,7 @@ interface KPICardProps {
   };
   icon: React.ReactNode;
   color?: 'blue' | 'green' | 'purple' | 'orange' | 'red' | 'brown';
+  description?: string;
 }
 
 const KPICard: React.FC<KPICardProps> = ({ 
@@ -18,7 +19,8 @@ const KPICard: React.FC<KPICardProps> = ({
   value, 
   change, 
   icon, 
-  color = 'brown' 
+  color = 'brown',
+  description
 }) => {
   const isPositive = change && change.value > 0;
   const isNegative = change && change.value < 0;
@@ -44,6 +46,10 @@ const KPICard: React.FC<KPICardProps> = ({
               {isPositive ? '+' : ''}{change.value}% {change.period}
             </ChangeText>
           </ChangeIndicator>
+        )}
+        
+        {description && (
+          <CardDescription>{description}</CardDescription>
         )}
       </CardContent>
     </CardContainer>
@@ -176,4 +182,12 @@ const ChangeIcon = styled.div`
 
 const ChangeText = styled.span`
   font-size: 0.875rem;
+`;
+
+const CardDescription = styled.p`
+  font-size: 0.75rem;
+  color: #718096;
+  margin: 0.5rem 0 0 0;
+  font-weight: 400;
+  line-height: 1.4;
 `;

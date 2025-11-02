@@ -1,6 +1,8 @@
 import React from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend, BarChart, XAxis, YAxis, CartesianGrid, Bar } from 'recharts';
 
+const currency = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+
 interface Item {
   nome: string;
   pedidos?: number;
@@ -22,10 +24,27 @@ const DistribuicaoPlataformasChart: React.FC<Props> = ({ data, mode = 'pie' }) =
         <BarChart data={data} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="nome" />
-          <YAxis />
-          <Tooltip formatter={(v: any) => `${(v * 100).toFixed(1)}%`} />
+          <YAxis 
+            tickFormatter={(value) => {
+              if (data[0]?.receita) {
+                return `R$ ${(value / 1000).toFixed(0)}k`;
+              }
+              return value.toString();
+            }}
+          />
+          <Tooltip 
+            formatter={(value: any, name: string, props: any) => {
+              const item = props.payload || {};
+              if (item.receita !== undefined) {
+                return [currency.format(item.receita), 'Receita'];
+              } else if (item.pedidos !== undefined) {
+                return [`${item.pedidos.toLocaleString('pt-BR')} pedidos`, 'Pedidos'];
+              }
+              return [value, name];
+            }}
+          />
           <Legend />
-          <Bar dataKey="pct" name="% do total">
+          <Bar dataKey={data[0]?.receita ? "receita" : "pedidos"} name={data[0]?.receita ? "Receita" : "Pedidos"}>
             {data.map((_, idx) => (
               <Cell key={idx} fill={COLORS[idx % COLORS.length]} />
             ))}

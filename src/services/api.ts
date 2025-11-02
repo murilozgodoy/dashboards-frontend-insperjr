@@ -610,5 +610,108 @@ export const apiService = {
     const response = await fetch(`${API_BASE_URL}/api/rentabilidade/roi-por-plataforma${qs.toString() ? `?${qs}` : ''}`);
     if (!response.ok) throw new Error('Erro ao buscar ROI por plataforma');
     return response.json();
+  },
+
+  //endpoints platafomas
+  
+  async getPlataformasReceitaTempo(params?: { granularidade?: 'dia'|'semana'|'mes'; metric?: 'receita'|'pedidos'; inicio?: string; fim?: string }): Promise<{
+    granularidade: 'dia'|'semana'|'mes';
+    metric: 'receita'|'pedidos';
+    dados: {
+      periodo: string;
+      [key: string]: string | number;
+    }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.granularidade) qs.set('granularidade', params.granularidade);
+    if (params?.metric) qs.set('metric', params.metric);
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/plataformas/receita-tempo${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar evolução temporal por plataforma');
+    return response.json();
+  },
+
+  async getPlataformasTemposMedios(params?: { inicio?: string; fim?: string }): Promise<{
+    plataformas: {
+      plataforma: string;
+      tempo_preparo_medio: number;
+      tempo_entrega_medio: number;
+      eta_medio: number;
+    }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/plataformas/tempos-medios${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar tempos médios por plataforma');
+    return response.json();
+  },
+
+  async getPlataformasSatisfacao(params?: { inicio?: string; fim?: string }): Promise<{
+    plataformas: {
+      plataforma: string;
+      satisfacao_media: number;
+      total_avaliacoes: number;
+      distribuicao: {
+        nivel_1: number;
+        nivel_2: number;
+        nivel_3: number;
+        nivel_4: number;
+        nivel_5: number;
+      };
+    }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/plataformas/satisfacao${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar satisfação por plataforma');
+    return response.json();
+  },
+
+  async getPlataformasVolumeHora(params?: { inicio?: string; fim?: string }): Promise<{
+    dados: {
+      hora: number;
+      [key: string]: number;
+    }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/plataformas/volume-hora${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar volume por hora');
+    return response.json();
+  },
+
+  async getPlataformasVolumeDiaSemana(params?: { inicio?: string; fim?: string }): Promise<{
+    dados: {
+      dia: string;
+      dia_ordem: number;
+      [key: string]: string | number;
+    }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/plataformas/volume-dia-semana${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar volume por dia da semana');
+    return response.json();
+  },
+
+  async getPlataformasModosPedido(params?: { inicio?: string; fim?: string }): Promise<{
+    plataformas: {
+      plataforma: string;
+      delivery: number;
+      retirada: number;
+      total: number;
+    }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/plataformas/modos-pedido${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar modos de pedido por plataforma');
+    return response.json();
   }
 };
