@@ -1,6 +1,7 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import styled from 'styled-components';
+import { CHART_COLORS } from '../config/colors';
 
 interface SatisfacaoPlataformasChartProps {
   dados: {
@@ -66,7 +67,7 @@ const SatisfacaoPlataformasChart: React.FC<SatisfacaoPlataformasChartProps> = ({
             }}
           />
           <Legend />
-          <Bar dataKey="satisfacao_media" name="Satisfação Média" fill="#3b82f6" />
+          <Bar dataKey="satisfacao_media" name="Satisfação Média" fill={CHART_COLORS.azul} />
         </BarChart>
       </ResponsiveContainer>
     </Container>
