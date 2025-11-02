@@ -372,5 +372,149 @@ export const apiService = {
     const response = await fetch(`${API_BASE_URL}/api/operacional/outliers-detalhados${qs.toString() ? `?${qs}` : ''}`);
     if (!response.ok) throw new Error('Erro ao buscar outliers detalhados');
     return response.json();
+  },
+
+  // RENTABILIDADE ENDPOINTS
+  async getRentabilidadeKpis(params?: { inicio?: string; fim?: string }): Promise<{
+    receita_bruta_total: number;
+    comissoes_totais: number;
+    receita_liquida: number;
+    margem_liquida_pct: number;
+    receita_liquida_vs_bruta_pct: number;
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/rentabilidade/kpis${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar KPIs de rentabilidade');
+    return response.json();
+  },
+
+  async getRentabilidadeWaterfall(params?: { inicio?: string; fim?: string }): Promise<{
+    receita_bruta: number;
+    menos_comissao_ifood: number;
+    menos_comissao_rappi: number;
+    receita_liquida_final: number;
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/rentabilidade/waterfall${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar dados do waterfall');
+    return response.json();
+  },
+
+  async getRentabilidadeMargensPorPlataforma(params?: { inicio?: string; fim?: string }): Promise<{
+    plataformas: {
+      plataforma: string;
+      receita_bruta: number;
+      comissao_pct: number;
+      comissao_brl: number;
+      receita_liquida: number;
+      margem_pct: number;
+    }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/rentabilidade/margens-por-plataforma${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar margens por plataforma');
+    return response.json();
+  },
+
+  async getRentabilidadeCanaisVsMarketplace(params?: { inicio?: string; fim?: string }): Promise<{
+    marketplaces: {
+      receita_bruta: number;
+      comissao_pct: number;
+      comissao_brl: number;
+      receita_liquida: number;
+      margem_pct: number;
+    };
+    canais_proprios: {
+      receita_bruta: number;
+      comissao_brl: number;
+      receita_liquida: number;
+      margem_pct: number;
+    };
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/rentabilidade/canais-vs-marketplace${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar comparação canais vs marketplace');
+    return response.json();
+  },
+
+  async getRentabilidadeSimulacao(params: { pct_canal_proprio: number; inicio?: string; fim?: string }): Promise<{
+    economia_comissoes: number;
+    aumento_receita_liquida_pct: number;
+    receita_bruta_atual: number;
+    comissoes_atual: number;
+    receita_liquida_atual: number;
+    receita_bruta_simulada: number;
+    comissoes_simulada: number;
+    receita_liquida_simulada: number;
+  }> {
+    const qs = new URLSearchParams();
+    qs.set('pct_canal_proprio', params.pct_canal_proprio.toString());
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/rentabilidade/simulacao?${qs}`);
+    if (!response.ok) throw new Error('Erro ao buscar simulação');
+    return response.json();
+  },
+
+  async getRentabilidadePorTipo(params?: { inicio?: string; fim?: string }): Promise<{
+    tipos: {
+      tipo: string;
+      ticket_medio: number;
+      receita_bruta: number;
+      comissao_brl: number;
+      receita_liquida: number;
+      margem_pct: number;
+    }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/rentabilidade/rentabilidade-por-tipo${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar rentabilidade por tipo');
+    return response.json();
+  },
+
+  async getRentabilidadeEvolucaoTemporal(params?: { granularidade?: 'dia'|'semana'|'mes'; inicio?: string; fim?: string }): Promise<{
+    granularidade: 'dia'|'semana'|'mes';
+    dados: {
+      periodo: string;
+      receita_bruta: number;
+      comissoes: number;
+      receita_liquida: number;
+      margem_pct: number;
+    }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.granularidade) qs.set('granularidade', params.granularidade);
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/rentabilidade/evolucao-temporal${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar evolução temporal da rentabilidade');
+    return response.json();
+  },
+
+  async getRentabilidadeROIPorPlataforma(params?: { inicio?: string; fim?: string }): Promise<{
+    plataformas: {
+      plataforma: string;
+      investimento: number;
+      retorno: number;
+      roi_pct: number;
+      payback_meses: number;
+    }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/rentabilidade/roi-por-plataforma${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar ROI por plataforma');
+    return response.json();
   }
 };
