@@ -27,7 +27,7 @@ Frontend da aplicação de dashboards para análise de dados do restaurante Kais
 
 4. **Navegue até a pasta do projeto:**
    ```bash
-   cd caminho/para/dashboards-frontend-insperjr
+   cd caminho/para/dashboard-kaiserhaus
    ```
 
 5. **Instale as dependências:**
@@ -58,7 +58,7 @@ Frontend da aplicação de dashboards para análise de dados do restaurante Kais
 ## Estrutura
 
 ```
-dashboards-frontend-insperjr/
+dashboard-kaiserhaus/
 ├── src/
 │   ├── components/        # Componentes React
 │   │   └── ApiTest.tsx   # Componente de teste da API

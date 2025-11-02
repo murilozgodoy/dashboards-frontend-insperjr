@@ -235,5 +235,99 @@ export const apiService = {
     const response = await fetch(`${API_BASE_URL}/api/geografica/plataformas-por-bairro${qs.toString() ? `?${qs}` : ''}`);
     if (!response.ok) throw new Error('Erro ao buscar plataformas por bairro');
     return response.json();
+  },
+
+  // TEMPORAL ENDPOINTS
+  async getTemporalPeriodoDia(params?: { inicio?: string; fim?: string }): Promise<{
+    data: { periodo: string; quantidade: number }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/temporal/periodo-dia${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar período do dia');
+    return response.json();
+  },
+
+  async getTemporalTipoDia(params?: { inicio?: string; fim?: string }): Promise<{
+    data: { tipo: string; quantidade: number }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/temporal/tipo-dia${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar tipo de dia');
+    return response.json();
+  },
+
+  async getTemporalHeatmapHorario(params?: { inicio?: string; fim?: string }): Promise<{
+    data: { dia_semana: string; hora: number; quantidade: number }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/temporal/heatmap-horario${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar heatmap de horário');
+    return response.json();
+  },
+
+  async getTemporalEvolucaoPedidos(params?: { inicio?: string; fim?: string; granularidade?: 'dia'|'semana'|'mes' }): Promise<{
+    data: { periodo: string; receita: number; pedidos: number }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    if (params?.granularidade) qs.set('granularidade', params.granularidade);
+    const response = await fetch(`${API_BASE_URL}/api/temporal/evolucao-pedidos${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar evolução de pedidos');
+    return response.json();
+  },
+
+  async getTemporalHorarioPico(params?: { inicio?: string; fim?: string }): Promise<{
+    data: { hora: number; quantidade: number }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/temporal/horario-pico${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar horário de pico');
+    return response.json();
+  },
+
+  async getTemporalSazonalidadeSemanal(params?: { inicio?: string; fim?: string; metric?: 'pedidos' | 'receita' }): Promise<{
+    data: { dia_semana: string; valor: number }[];
+    metric: string;
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    if (params?.metric) qs.set('metric', params.metric);
+    const response = await fetch(`${API_BASE_URL}/api/temporal/sazonalidade-semanal${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar sazonalidade semanal');
+    return response.json();
+  },
+
+  async getTemporalComparacaoTendencias(params?: { inicio?: string; fim?: string; granularidade?: 'semana' | 'mes' }): Promise<{
+    data: { periodo: string; pedidos: number; receita: number; variacao_pedidos_pct: number; variacao_receita_pct: number }[];
+    granularidade: string;
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    if (params?.granularidade) qs.set('granularidade', params.granularidade);
+    const response = await fetch(`${API_BASE_URL}/api/temporal/comparacao-tendencias${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar comparação de tendências');
+    return response.json();
+  },
+
+  async getTemporalTendenciasDiarias(params?: { inicio?: string; fim?: string }): Promise<{
+    data: { dia_semana: string; total_pedidos: number; media_pedidos: number }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/temporal/tendencias-diarias${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar tendências diárias');
+    return response.json();
   }
 };
