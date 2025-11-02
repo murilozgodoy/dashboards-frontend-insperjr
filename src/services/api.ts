@@ -240,14 +240,6 @@ export const apiService = {
   // TEMPORAL ENDPOINTS
   async getTemporalPeriodoDia(params?: { inicio?: string; fim?: string }): Promise<{
     data: { periodo: string; quantidade: number }[];
-  //endpoints operacional
-  async getOperacionalKpis(params?: { inicio?: string; fim?: string; threshold_minutos?: number }): Promise<{
-    tempo_preparo_medio: number;
-    tempo_entrega_medio: number;
-    precisao_eta_pct: number;
-    taxa_atraso_pct: number;
-    eficiencia_media: number;
-    desempenho_eta: number;
   }> {
     const qs = new URLSearchParams();
     if (params?.inicio) qs.set('inicio', params.inicio);
@@ -293,6 +285,27 @@ export const apiService = {
 
   async getTemporalHorarioPico(params?: { inicio?: string; fim?: string }): Promise<{
     data: { hora: number; quantidade: number }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/temporal/horario-pico${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar horário de pico');
+    return response.json();
+  },
+
+  // OPERACIONAL ENDPOINTS
+  async getOperacionalKpis(params?: { inicio?: string; fim?: string; threshold_minutos?: number }): Promise<{
+    tempo_preparo_medio: number;
+    tempo_entrega_medio: number;
+    precisao_eta_pct: number;
+    taxa_atraso_pct: number;
+    eficiencia_media: number;
+    desempenho_eta: number;
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
     if (params?.threshold_minutos !== undefined) qs.set('threshold_minutos', params.threshold_minutos.toString());
     const response = await fetch(`${API_BASE_URL}/api/operacional/kpis${qs.toString() ? `?${qs}` : ''}`);
     if (!response.ok) throw new Error('Erro ao buscar KPIs operacionais');
@@ -484,8 +497,8 @@ export const apiService = {
     const qs = new URLSearchParams();
     if (params?.inicio) qs.set('inicio', params.inicio);
     if (params?.fim) qs.set('fim', params.fim);
-    const response = await fetch(`${API_BASE_URL}/api/temporal/horario-pico${qs.toString() ? `?${qs}` : ''}`);
-    if (!response.ok) throw new Error('Erro ao buscar horário de pico');
+    const response = await fetch(`${API_BASE_URL}/api/rentabilidade/canais-vs-marketplace${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar comparação canais vs marketplace');
     return response.json();
   },
 
@@ -505,8 +518,13 @@ export const apiService = {
   async getTemporalComparacaoTendencias(params?: { inicio?: string; fim?: string; granularidade?: 'semana' | 'mes' }): Promise<{
     data: { periodo: string; pedidos: number; receita: number; variacao_pedidos_pct: number; variacao_receita_pct: number }[];
     granularidade: string;
-    const response = await fetch(`${API_BASE_URL}/api/rentabilidade/canais-vs-marketplace${qs.toString() ? `?${qs}` : ''}`);
-    if (!response.ok) throw new Error('Erro ao buscar comparação canais vs marketplace');
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    if (params?.granularidade) qs.set('granularidade', params.granularidade);
+    const response = await fetch(`${API_BASE_URL}/api/temporal/comparacao-tendencias${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar comparação de tendências');
     return response.json();
   },
 
@@ -529,6 +547,17 @@ export const apiService = {
     return response.json();
   },
 
+  async getTemporalTendenciasDiarias(params?: { inicio?: string; fim?: string }): Promise<{
+    data: { dia_semana: string; total_pedidos: number; media_pedidos: number }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/temporal/tendencias-diarias${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar tendências diárias');
+    return response.json();
+  },
+
   async getRentabilidadePorTipo(params?: { inicio?: string; fim?: string }): Promise<{
     tipos: {
       tipo: string;
@@ -542,14 +571,6 @@ export const apiService = {
     const qs = new URLSearchParams();
     if (params?.inicio) qs.set('inicio', params.inicio);
     if (params?.fim) qs.set('fim', params.fim);
-    if (params?.granularidade) qs.set('granularidade', params.granularidade);
-    const response = await fetch(`${API_BASE_URL}/api/temporal/comparacao-tendencias${qs.toString() ? `?${qs}` : ''}`);
-    if (!response.ok) throw new Error('Erro ao buscar comparação de tendências');
-    return response.json();
-  },
-
-  async getTemporalTendenciasDiarias(params?: { inicio?: string; fim?: string }): Promise<{
-    data: { dia_semana: string; total_pedidos: number; media_pedidos: number }[];
     const response = await fetch(`${API_BASE_URL}/api/rentabilidade/rentabilidade-por-tipo${qs.toString() ? `?${qs}` : ''}`);
     if (!response.ok) throw new Error('Erro ao buscar rentabilidade por tipo');
     return response.json();
@@ -586,8 +607,6 @@ export const apiService = {
     const qs = new URLSearchParams();
     if (params?.inicio) qs.set('inicio', params.inicio);
     if (params?.fim) qs.set('fim', params.fim);
-    const response = await fetch(`${API_BASE_URL}/api/temporal/tendencias-diarias${qs.toString() ? `?${qs}` : ''}`);
-    if (!response.ok) throw new Error('Erro ao buscar tendências diárias');
     const response = await fetch(`${API_BASE_URL}/api/rentabilidade/roi-por-plataforma${qs.toString() ? `?${qs}` : ''}`);
     if (!response.ok) throw new Error('Erro ao buscar ROI por plataforma');
     return response.json();
