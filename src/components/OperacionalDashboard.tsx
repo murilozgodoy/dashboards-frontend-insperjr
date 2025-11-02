@@ -317,17 +317,33 @@ const OperacionalDashboard: React.FC = () => {
               )}
             </ContainerGrafico>
 
-            <ContainerGrafico>
-              <CabecalhoGrafico>
-                <TituloGrafico>Precisão do ETA por Hora do Dia</TituloGrafico>
-                <SubtituloGrafico>Taxa de precisão do ETA ao longo do dia</SubtituloGrafico>
-              </CabecalhoGrafico>
-              {precisaoEtaHora.length ? (
-                <PrecisaoEtaHoraChart data={precisaoEtaHora} />
-              ) : (
-                <PlaceholderGrafico><TextoPlaceholder>Sem dados</TextoPlaceholder></PlaceholderGrafico>
-              )}
-            </ContainerGrafico>
+             <ContainerGrafico>
+               <CabecalhoGrafico>
+                 <TituloGrafico>Precisão do ETA por Hora do Dia</TituloGrafico>
+                 <SubtituloGrafico>
+                   Percentual de pedidos entregues no prazo por hora do dia.
+                 </SubtituloGrafico>
+                 <LegendaCores style={{ marginTop: '0.75rem' }}>
+                   <LegendaItem>
+                     <LegendaCor $cor="#10b981" />
+                     <span>Verde: ≥ 80% (Precisão Boa)</span>
+                   </LegendaItem>
+                   <LegendaItem>
+                     <LegendaCor $cor="#f59e0b" />
+                     <span>Amarelo: 60-79% (Precisão Média)</span>
+                   </LegendaItem>
+                   <LegendaItem>
+                     <LegendaCor $cor="#ef4444" />
+                     <span>Vermelho: &lt; 60% (Precisão Baixa)</span>
+                   </LegendaItem>
+                 </LegendaCores>
+               </CabecalhoGrafico>
+               {precisaoEtaHora.length ? (
+                 <PrecisaoEtaHoraChart data={precisaoEtaHora} />
+               ) : (
+                 <PlaceholderGrafico><TextoPlaceholder>Sem dados</TextoPlaceholder></PlaceholderGrafico>
+               )}
+             </ContainerGrafico>
           </GradeGraficos>
         </SecaoGraficos>
 
