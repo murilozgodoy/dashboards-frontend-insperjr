@@ -182,12 +182,9 @@ const Header: React.FC<HeaderProps> = ({
                 style={{ border: '1px solid #e2e8f0', borderRadius: 8, padding: '6px 8px', background: 'white', color: '#334155' }}
               />
             )}
-            <button 
-              onClick={applyRange}
-              style={{ border: '1px solid #3b82f6', color: 'white', background: '#3b82f6', borderRadius: 8, padding: '6px 10px', cursor: 'pointer' }}
-            >
+            <AplicarButton onClick={applyRange}>
               Aplicar
-            </button>
+            </AplicarButton>
           </DateSection>
         )}
 
@@ -292,7 +289,7 @@ const DateSection = styled.div`
 `;
 
 const CalendarIcon = styled.div`
-  color: #3b82f6;
+  color: #792810;
   font-size: 1.125rem;
   display: flex;
   align-items: center;
@@ -311,6 +308,22 @@ const ActionsSection = styled.div`
 
   @media (max-width: 480px) {
     gap: 0.5rem;
+  }
+`;
+
+const AplicarButton = styled.button`
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #792810 0%, #5C1F0C 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    box-shadow: 0 4px 12px rgba(121, 40, 16, 0.3);
   }
 `;
 
