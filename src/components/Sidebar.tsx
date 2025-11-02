@@ -92,7 +92,7 @@ export default Sidebar;
 const SidebarContainer = styled.div`
   width: 280px;
   height: 100vh;
-  background: linear-gradient(180deg, #1a1d29 0%, #2d3748 100%);
+  background: linear-gradient(180deg, #5C1F0C 0%, #792810 100%);
   position: fixed;
   left: 0;
   top: 0;
@@ -136,14 +136,14 @@ const LogoContainer = styled.div`
 const LogoIcon = styled.div`
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  background: linear-gradient(135deg, #792810 0%, #5C1F0C 100%);
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   font-size: 1.5rem;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 12px rgba(121, 40, 16, 0.3);
 `;
 
 const LogoImage = styled.img`
@@ -204,18 +204,18 @@ const SidebarItemContainer = styled.div<{ $isActive?: boolean; $isCollapsed?: bo
   cursor: pointer;
   transition: all 0.2s ease;
   background: ${props => props.$isActive 
-    ? 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)' 
+    ? 'linear-gradient(135deg, #792810 0%, #5C1F0C 100%)' 
     : 'transparent'
   };
   box-shadow: ${props => props.$isActive 
-    ? '0 4px 12px rgba(59, 130, 246, 0.3)' 
+    ? '0 4px 12px rgba(121, 40, 16, 0.3)' 
     : 'none'
   };
   justify-content: ${props => props.$isCollapsed ? 'center' : 'flex-start'};
 
   &:hover {
     background: ${props => props.$isActive 
-      ? 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)' 
+      ? 'linear-gradient(135deg, #792810 0%, #5C1F0C 100%)' 
       : 'rgba(255, 255, 255, 0.05)'
     };
     transform: translateX(4px);
@@ -249,7 +249,7 @@ const CollapseButton = styled.button`
   right: -12px;
   width: 24px;
   height: 24px;
-  background: #3b82f6;
+  background: #792810;
   border: none;
   border-radius: 50%;
   color: white;
@@ -262,7 +262,7 @@ const CollapseButton = styled.button`
   z-index: 1001;
 
   &:hover {
-    background: #1d4ed8;
+    background: #5C1F0C;
     transform: scale(1.1);
   }
 

@@ -10,7 +10,7 @@ interface KPICardProps {
     period: string;
   };
   icon: React.ReactNode;
-  color?: 'blue' | 'green' | 'purple' | 'orange' | 'red';
+  color?: 'blue' | 'green' | 'purple' | 'orange' | 'red' | 'brown';
 }
 
 const KPICard: React.FC<KPICardProps> = ({ 
@@ -18,7 +18,7 @@ const KPICard: React.FC<KPICardProps> = ({
   value, 
   change, 
   icon, 
-  color = 'blue' 
+  color = 'brown' 
 }) => {
   const isPositive = change && change.value > 0;
   const isNegative = change && change.value < 0;
@@ -75,7 +75,7 @@ const CardContainer = styled.div`
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%);
+    background: linear-gradient(90deg, #792810 0%, #5C1F0C 100%);
   }
 
   @media (max-width: 768px) {
@@ -124,8 +124,10 @@ const IconWrapper = styled.div<{ color: string }>`
         return 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
       case 'red':
         return 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+      case 'brown':
+        return 'linear-gradient(135deg, #792810 0%, #5C1F0C 100%)';
       default:
-        return 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)';
+        return 'linear-gradient(135deg, #792810 0%, #5C1F0C 100%)';
     }
   }};
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
