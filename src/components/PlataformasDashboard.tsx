@@ -4,6 +4,7 @@ import Layout from './Layout';
 import KPICard from './KPICard';
 import { FiTrendingUp } from 'react-icons/fi';
 import { apiService } from '../services/api';
+import { CHART_COLORS } from '../config/colors';
 import DistribuicaoPlataformasChart from './DistribuicaoPlataformasChart';
 import ReceitaTempoPlataformasChart from './ReceitaTempoPlataformasChart';
 import TemposMediosPlataformasChart from './TemposMediosPlataformasChart';
@@ -348,8 +349,8 @@ const ToggleGroup = styled.div`
 
 const ToggleButton = styled.button<{ $active: boolean }>`
   padding: 0.375rem 0.75rem;
-  border: 1px solid ${props => props.$active ? '#792810' : '#e2e8f0'};
-  background-color: ${props => props.$active ? '#792810' : 'white'};
+  border: 1px solid ${props => props.$active ? CHART_COLORS.marrom : '#e2e8f0'};
+  background-color: ${props => props.$active ? CHART_COLORS.marrom : 'white'};
   color: ${props => props.$active ? 'white' : '#4a5568'};
   border-radius: 6px;
   font-size: 0.875rem;
@@ -358,7 +359,7 @@ const ToggleButton = styled.button<{ $active: boolean }>`
   transition: all 0.2s;
   
   &:hover {
-    border-color: #792810;
-    background-color: ${props => props.$active ? '#5C1F0C' : '#f7f1ef'};
+    border-color: ${CHART_COLORS.marrom};
+    background-color: ${props => props.$active ? '#78350f' : '#f7f1ef'};
   }
 `;

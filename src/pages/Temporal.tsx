@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Layout from '../components/Layout';
+import { CHART_COLORS } from '../config/colors';
 import PeriodoDiaChart from '../components/PeriodoDiaChart';
 import TipoDiaChart from '../components/TipoDiaChart';
 import HorarioPicoChart from '../components/HorarioPicoChart';
@@ -255,13 +256,14 @@ const ToggleButton = styled.button<{ active: boolean }>`
   font-size: 0.875rem;
   border: 1px solid #cbd5e1;
   border-radius: 6px;
-  background: ${props => props.active ? '#3b82f6' : 'white'};
+  background: ${props => props.active ? CHART_COLORS.marrom : 'white'};
   color: ${props => props.active ? 'white' : '#64748b'};
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background: ${props => props.active ? '#2563eb' : '#f1f5f9'};
+    background: ${props => props.active ? '#78350f' : '#f1f5f9'};
+    border-color: ${props => props.active ? CHART_COLORS.marrom : '#cbd5e1'};
   }
 `;
 
