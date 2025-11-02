@@ -1,6 +1,7 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 import styled from 'styled-components';
+import { CHART_COLORS } from '../config/colors';
 
 interface TemposMediosPlataformasChartProps {
   dados: {
@@ -12,9 +13,9 @@ interface TemposMediosPlataformasChartProps {
 }
 
 const CORES = {
-  preparo: '#3b82f6',
-  entrega: '#10b981',
-  eta: '#8b5cf6'
+  preparo: CHART_COLORS.azul,
+  entrega: CHART_COLORS.amarelo,
+  eta: CHART_COLORS.marrom
 };
 
 const TemposMediosPlataformasChart: React.FC<TemposMediosPlataformasChartProps> = ({ dados }) => {

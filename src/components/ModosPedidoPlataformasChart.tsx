@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import styled from 'styled-components';
+import { CHART_COLORS } from '../config/colors';
 
 interface ModosPedidoPlataformasChartProps {
   dados: {
@@ -12,8 +13,8 @@ interface ModosPedidoPlataformasChartProps {
 }
 
 const CORES = {
-  delivery: '#3b82f6',
-  retirada: '#10b981'
+  delivery: CHART_COLORS.vermelho,
+  retirada: CHART_COLORS.amarelo
 };
 
 const ModosPedidoPlataformasChart: React.FC<ModosPedidoPlataformasChartProps> = ({ dados }) => {
