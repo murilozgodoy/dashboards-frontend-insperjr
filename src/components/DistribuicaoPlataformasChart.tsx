@@ -1,5 +1,6 @@
 import React from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend, BarChart, XAxis, YAxis, CartesianGrid, Bar } from 'recharts';
+import { CHART_COLORS_ARRAY, getChartColor } from '../config/colors';
 
 interface Item {
   nome: string;
@@ -13,8 +14,6 @@ interface Props {
   mode?: 'pie' | 'bar';
 }
 
-const COLORS = ['#3b82f6', '#ef4444', '#22c55e', '#f59e0b', '#8b5cf6'];
-
 const DistribuicaoPlataformasChart: React.FC<Props> = ({ data, mode = 'pie' }) => {
   if (mode === 'bar') {
     return (
@@ -27,7 +26,7 @@ const DistribuicaoPlataformasChart: React.FC<Props> = ({ data, mode = 'pie' }) =
           <Legend />
           <Bar dataKey="pct" name="% do total">
             {data.map((_, idx) => (
-              <Cell key={idx} fill={COLORS[idx % COLORS.length]} />
+              <Cell key={idx} fill={getChartColor(idx)} />
             ))}
           </Bar>
         </BarChart>
@@ -40,7 +39,7 @@ const DistribuicaoPlataformasChart: React.FC<Props> = ({ data, mode = 'pie' }) =
       <PieChart>
         <Pie data={data} dataKey="pct" nameKey="nome" outerRadius={110} label>
           {data.map((_, idx) => (
-            <Cell key={idx} fill={COLORS[idx % COLORS.length]} />
+            <Cell key={idx} fill={getChartColor(idx)} />
           ))}
         </Pie>
         <Tooltip formatter={(v: any) => `${(v * 100).toFixed(1)}%`} />

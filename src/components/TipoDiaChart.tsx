@@ -1,5 +1,6 @@
 import React from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { CHART_COLORS_ARRAY, getChartColor } from '../config/colors';
 
 interface Item {
   tipo: string;
@@ -9,8 +10,6 @@ interface Item {
 interface Props {
   data: Item[];
 }
-
-const COLORS = ['#3b82f6', '#f59e0b'];
 
 const TipoDiaChart: React.FC<Props> = ({ data }) => {
   const total = data.reduce((sum, item) => sum + item.quantidade, 0);
@@ -30,7 +29,7 @@ const TipoDiaChart: React.FC<Props> = ({ data }) => {
           label={({ tipo, porcentagem }) => `${tipo}: ${porcentagem}%`}
         >
           {data.map((_, idx) => (
-            <Cell key={idx} fill={COLORS[idx % COLORS.length]} />
+            <Cell key={idx} fill={getChartColor(idx)} />
           ))}
         </Pie>
         <Tooltip formatter={(v: any) => `${v.toLocaleString('pt-BR')} pedidos`} />

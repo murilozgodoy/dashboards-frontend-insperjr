@@ -1,5 +1,6 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { CHART_COLORS } from '../config/colors';
 
 interface Item {
   dia_semana: string;
@@ -29,7 +30,7 @@ const SazonalidadeSemanalChart: React.FC<Props> = ({ data, metric = 'pedidos' })
         <YAxis />
         <Tooltip formatter={formatter} />
         <Legend />
-        <Bar dataKey="valor" name={metric === 'receita' ? 'Receita' : 'Pedidos'} fill="#3b82f6" />
+        <Bar dataKey="valor" name={metric === 'receita' ? 'Receita' : 'Pedidos'} fill={CHART_COLORS.azul} />
       </BarChart>
     </ResponsiveContainer>
   );

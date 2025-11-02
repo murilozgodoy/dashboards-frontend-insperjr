@@ -1,5 +1,6 @@
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { CHART_COLORS } from '../config/colors';
 
 interface TemposPorHoraChartProps {
   data: { hora: number; tempo_preparo_medio: number; tempo_entrega_medio: number; quantidade: number }[];
@@ -49,7 +50,7 @@ const TemposPorHoraChart: React.FC<TemposPorHoraChartProps> = ({ data }) => {
         <Line 
           type="monotone" 
           dataKey="tempo_preparo_medio" 
-          stroke="#f59e0b" 
+          stroke={CHART_COLORS.amarelo} 
           strokeWidth={2}
           name="Tempo Preparo"
           dot={{ r: 3 }}
@@ -58,7 +59,7 @@ const TemposPorHoraChart: React.FC<TemposPorHoraChartProps> = ({ data }) => {
         <Line 
           type="monotone" 
           dataKey="tempo_entrega_medio" 
-          stroke="#3b82f6" 
+          stroke={CHART_COLORS.marrom} 
           strokeWidth={2}
           name="Tempo Entrega"
           dot={{ r: 3 }}

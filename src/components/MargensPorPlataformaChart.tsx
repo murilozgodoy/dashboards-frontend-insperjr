@@ -1,5 +1,6 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { getChartColor } from '../config/colors';
 
 interface Plataforma {
   plataforma: string;
@@ -13,8 +14,6 @@ interface Plataforma {
 interface Props {
   data: Plataforma[];
 }
-
-const COLORS = ['#3b82f6', '#22c55e', '#ef4444', '#f59e0b', '#8b5cf6'];
 
 const MargensPorPlataformaChart: React.FC<Props> = ({ data }) => {
   return (
@@ -35,7 +34,7 @@ const MargensPorPlataformaChart: React.FC<Props> = ({ data }) => {
         />
         <Bar dataKey="margem_pct" name="Margem %">
           {data.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            <Cell key={`cell-${index}`} fill={getChartColor(index)} />
           ))}
         </Bar>
       </BarChart>

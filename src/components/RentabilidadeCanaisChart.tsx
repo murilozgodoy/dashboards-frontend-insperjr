@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Cell } from 'recharts';
+import { CHART_COLORS } from '../config/colors';
 
 interface CanaisData {
   marketplaces: {
@@ -66,7 +67,7 @@ const RentabilidadeCanaisChart: React.FC<Props> = ({ data }) => {
             <YAxis tick={{ fontSize: 12 }} tickFormatter={(value) => `${value}%`} />
             <Tooltip formatter={(value: any) => `${value.toFixed(2)}%`} />
             <Legend />
-            <Bar dataKey="margem" name="Margem %" fill="#3b82f6" />
+            <Bar dataKey="margem" name="Margem %" fill={CHART_COLORS.azul} />
           </BarChart>
         </ResponsiveContainer>
       </ChartSection>

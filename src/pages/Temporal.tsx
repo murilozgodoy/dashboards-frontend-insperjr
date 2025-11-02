@@ -6,8 +6,8 @@ import TipoDiaChart from '../components/TipoDiaChart';
 import HorarioPicoChart from '../components/HorarioPicoChart';
 import LineChartReceita from '../components/LineChartReceita';
 import SazonalidadeSemanalChart from '../components/SazonalidadeSemanalChart';
-import ComparacaoTendenciasChart from '../components/ComparacaoTendenciasChart';
 import TendenciasDiariasChart from '../components/TendenciasDiariasChart';
+import PrevistoVsRealChart from '../components/PrevistoVsRealChart';
 import { apiService } from '../services/api';
 
 const Temporal: React.FC = () => {
@@ -21,9 +21,8 @@ const Temporal: React.FC = () => {
   const [evolucaoPedidos, setEvolucaoPedidos] = useState<{ periodo: string; receita: number; pedidos: number }[]>([]);
   const [sazonalidadeSemanal, setSazonalidadeSemanal] = useState<{ dia_semana: string; valor: number }[]>([]);
   const [sazonalidadeMetric, setSazonalidadeMetric] = useState<'pedidos' | 'receita'>('pedidos');
-  const [comparacaoTendencias, setComparacaoTendencias] = useState<{ periodo: string; pedidos: number; receita: number; variacao_pedidos_pct: number; variacao_receita_pct: number }[]>([]);
-  const [tendenciasGranularidade, setTendenciasGranularidade] = useState<'semana' | 'mes'>('semana');
   const [tendenciasDiarias, setTendenciasDiarias] = useState<{ dia_semana: string; total_pedidos: number; media_pedidos: number }[]>([]);
+  const [previstoVsReal, setPrevistoVsReal] = useState<{ periodo: string; pedidos_real: number; pedidos_previsto: number }[]>([]);
 
   const [defaultInicio, setDefaultInicio] = useState<string | null>(null);
   const [defaultFim, setDefaultFim] = useState<string | null>(null);
@@ -82,16 +81,16 @@ const Temporal: React.FC = () => {
         pico,
         evolucao,
         sazonalidade,
-        comparacao,
-        tendencias
+        tendencias,
+        previsto
       ] = await Promise.all([
         apiService.getTemporalPeriodoDia({ inicio, fim }),
         apiService.getTemporalTipoDia({ inicio, fim }),
         apiService.getTemporalHorarioPico({ inicio, fim }),
         apiService.getTemporalEvolucaoPedidos({ inicio, fim, granularidade }),
         apiService.getTemporalSazonalidadeSemanal({ inicio, fim, metric: sazonalidadeMetric }),
-        apiService.getTemporalComparacaoTendencias({ inicio, fim, granularidade: tendenciasGranularidade }),
-        apiService.getTemporalTendenciasDiarias({ inicio, fim })
+        apiService.getTemporalTendenciasDiarias({ inicio, fim }),
+        apiService.getTemporalPrevistoVsReal({ inicio, fim })
       ]);
 
       setPeriodoDia(periodo.data);
@@ -99,8 +98,8 @@ const Temporal: React.FC = () => {
       setHorarioPico(pico.data);
       setEvolucaoPedidos(evolucao.data);
       setSazonalidadeSemanal(sazonalidade.data);
-      setComparacaoTendencias(comparacao.data);
       setTendenciasDiarias(tendencias.data);
+      setPrevistoVsReal(previsto.data);
       setError(null);
     } catch (e: any) {
       setError(e?.message || 'Erro ao carregar dados temporais');
@@ -126,22 +125,6 @@ const Temporal: React.FC = () => {
     }
   };
 
-  const handleTendenciasGranularidadeChange = async (granularidade: 'semana' | 'mes') => {
-    const inicio = defaultInicio || '';
-    const fim = defaultFim || '';
-    if (!inicio || !fim) return;
-    setTendenciasGranularidade(granularidade);
-    try {
-      const result = await apiService.getTemporalComparacaoTendencias({ 
-        inicio, 
-        fim, 
-        granularidade 
-      });
-      setComparacaoTendencias(result.data);
-    } catch (e: any) {
-      console.error('Erro ao alterar granularidade:', e);
-    }
-  };
 
   if (loading && periodoDia.length === 0) {
     return (
@@ -217,29 +200,13 @@ const Temporal: React.FC = () => {
         {/* Terceira linha de gráficos */}
         <GridRow>
           <SectionCard>
-            <SectionTitle>
-              Comparação de Tendências
-              <GranularityToggle>
-                <ToggleButton 
-                  active={tendenciasGranularidade === 'semana'} 
-                  onClick={() => handleTendenciasGranularidadeChange('semana')}
-                >
-                  Semanal
-                </ToggleButton>
-                <ToggleButton 
-                  active={tendenciasGranularidade === 'mes'} 
-                  onClick={() => handleTendenciasGranularidadeChange('mes')}
-                >
-                  Mensal
-                </ToggleButton>
-              </GranularityToggle>
-            </SectionTitle>
-            <ComparacaoTendenciasChart data={comparacaoTendencias} granularidade={tendenciasGranularidade} />
+            <SectionTitle>Análise de Tendências Diárias (Média)</SectionTitle>
+            <TendenciasDiariasChart data={tendenciasDiarias} />
           </SectionCard>
 
           <SectionCard>
-            <SectionTitle>Análise de Tendências Diárias (Média)</SectionTitle>
-            <TendenciasDiariasChart data={tendenciasDiarias} />
+            <SectionTitle>Pedidos Previstos vs Reais (Diário)</SectionTitle>
+            <PrevistoVsRealChart data={previstoVsReal} />
           </SectionCard>
         </GridRow>
       </TemporalContainer>

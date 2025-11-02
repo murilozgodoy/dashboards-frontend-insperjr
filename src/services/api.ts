@@ -558,6 +558,17 @@ export const apiService = {
     return response.json();
   },
 
+  async getTemporalPrevistoVsReal(params?: { inicio?: string; fim?: string }): Promise<{
+    data: { periodo: string; pedidos_real: number; pedidos_previsto: number }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/temporal/previsto-vs-real${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar previsto vs real');
+    return response.json();
+  },
+
   async getRentabilidadePorTipo(params?: { inicio?: string; fim?: string }): Promise<{
     tipos: {
       tipo: string;

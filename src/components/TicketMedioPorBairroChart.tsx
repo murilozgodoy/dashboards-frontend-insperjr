@@ -1,12 +1,12 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { getChartColor } from '../config/colors';
 
 interface TicketMedioPorBairroChartProps {
   data: { bairro: string; ticket_medio: number }[];
 }
 
 const TicketMedioPorBairroChart: React.FC<TicketMedioPorBairroChartProps> = ({ data }) => {
-  const COLORS = ['#f59e0b', '#fbbf24', '#fcd34d', '#fde68a', '#fef3c7'];
   
   const currency = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
   
@@ -36,7 +36,7 @@ const TicketMedioPorBairroChart: React.FC<TicketMedioPorBairroChartProps> = ({ d
         />
         <Bar dataKey="ticket_medio" radius={[8, 8, 0, 0]}>
           {data.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            <Cell key={`cell-${index}`} fill={getChartColor(index)} />
           ))}
         </Bar>
       </BarChart>

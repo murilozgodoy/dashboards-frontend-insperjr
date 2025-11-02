@@ -1,5 +1,6 @@
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { CHART_COLORS } from '../config/colors';
 
 interface SatisfacaoPorDistanciaChartProps {
   data: { faixa: string; satisfacao: number }[];
@@ -33,9 +34,9 @@ const SatisfacaoPorDistanciaChart: React.FC<SatisfacaoPorDistanciaChartProps> = 
         <Line 
           type="monotone" 
           dataKey="satisfacao" 
-          stroke="#8b5cf6" 
+          stroke={CHART_COLORS.marrom} 
           strokeWidth={3}
-          dot={{ fill: '#8b5cf6', r: 5 }}
+          dot={{ fill: CHART_COLORS.marrom, r: 5 }}
           activeDot={{ r: 7 }}
         />
       </LineChart>
