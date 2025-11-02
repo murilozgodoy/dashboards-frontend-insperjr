@@ -580,14 +580,14 @@ const FiltroInput = styled.input`
   
   &:focus {
     outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    border-color: #792810;
+    box-shadow: 0 0 0 3px rgba(121, 40, 16, 0.1);
   }
 `;
 
 const FiltroButton = styled.button`
   padding: 0.5rem 1rem;
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  background: linear-gradient(135deg, #792810 0%, #5C1F0C 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -598,7 +598,7 @@ const FiltroButton = styled.button`
   
   &:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 4px 12px rgba(121, 40, 16, 0.3);
   }
   
   &:active {
