@@ -38,11 +38,19 @@ const RentabilidadePorTipoChart: React.FC<Props> = ({ data }) => {
           labelFormatter={(label) => `Tipo: ${label}`}
         />
         <Legend />
-        <Bar yAxisId="left" dataKey="receita_bruta" name="Receita Bruta" fill={CHART_COLORS.azul} />
-        <Bar yAxisId="left" dataKey="receita_liquida" name="Receita Líquida" fill={CHART_COLORS.vermelho} />
-        <Bar yAxisId="right" dataKey="margem_pct" name="Margem %" fill={CHART_COLORS.amarelo}>
+        <Bar yAxisId="left" dataKey="receita_bruta" name="Receita Bruta" fill={CHART_COLORS.amarelo}>
           {data.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={CHART_COLORS.amarelo} />
+            <Cell key={`cell-receita-bruta-${index}`} fill={CHART_COLORS.amarelo} />
+          ))}
+        </Bar>
+        <Bar yAxisId="left" dataKey="receita_liquida" name="Receita Líquida" fill={CHART_COLORS.marrom}>
+          {data.map((entry, index) => (
+            <Cell key={`cell-receita-liquida-${index}`} fill={CHART_COLORS.marrom} />
+          ))}
+        </Bar>
+        <Bar yAxisId="right" dataKey="margem_pct" name="Margem %" fill={CHART_COLORS.azul}>
+          {data.map((entry, index) => (
+            <Cell key={`cell-margem-${index}`} fill={CHART_COLORS.azul} />
           ))}
         </Bar>
       </BarChart>

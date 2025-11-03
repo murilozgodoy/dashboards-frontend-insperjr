@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { getChartColor } from '../config/colors';
+import { CHART_COLORS } from '../config/colors';
 
 interface PlataformaROI {
   plataforma: string;
@@ -36,9 +36,9 @@ const ROIPorPlataformaChart: React.FC<Props> = ({ data }) => {
             />
             <YAxis tick={{ fontSize: 12 }} tickFormatter={(value) => `${value}%`} />
             <Tooltip formatter={(value: any) => `${value.toFixed(2)}%`} />
-            <Bar dataKey="roi_pct" name="ROI %">
+            <Bar dataKey="roi_pct" name="ROI %" fill={CHART_COLORS.amarelo}>
               {sortedData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={getChartColor(index)} />
+                <Cell key={`cell-${index}`} fill={CHART_COLORS.amarelo} />
               ))}
             </Bar>
           </BarChart>
@@ -54,7 +54,6 @@ const ROIPorPlataformaChart: React.FC<Props> = ({ data }) => {
               <th>Investimento</th>
               <th>Retorno</th>
               <th>ROI %</th>
-              <th>Payback</th>
             </tr>
           </thead>
           <tbody>
@@ -67,13 +66,6 @@ const ROIPorPlataformaChart: React.FC<Props> = ({ data }) => {
                   <ROICell roi={item.roi_pct}>
                     {item.roi_pct.toFixed(2)}%
                   </ROICell>
-                </td>
-                <td>
-                  {item.payback_meses > 0 && item.payback_meses < 999 ? (
-                    `${item.payback_meses.toFixed(1)} meses`
-                  ) : (
-                    'N/A'
-                  )}
                 </td>
               </tr>
             ))}

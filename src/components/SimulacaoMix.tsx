@@ -21,6 +21,14 @@ const SimulacaoMix: React.FC<SimulacaoProps> = ({ inicio, fim }) => {
     }
   }, [pctCanalProprio, inicio, fim]);
 
+  useEffect(() => {
+    // Inicializar o valor do slider
+    const slider = document.querySelector('input[type="range"]') as HTMLInputElement;
+    if (slider) {
+      slider.style.setProperty('--value', `${pctCanalProprio}%`);
+    }
+  }, [pctCanalProprio]);
+
   const loadSimulacao = async () => {
     try {
       setLoading(true);
@@ -50,7 +58,16 @@ const SimulacaoMix: React.FC<SimulacaoProps> = ({ inicio, fim }) => {
           min="0"
           max="100"
           value={pctCanalProprio}
-          onChange={(e) => setPctCanalProprio(Number(e.target.value))}
+          onChange={(e) => {
+            const value = Number(e.target.value);
+            setPctCanalProprio(value);
+            e.currentTarget.style.setProperty('--value', `${value}%`);
+          }}
+          onInput={(e) => {
+            const value = Number((e.target as HTMLInputElement).value);
+            (e.target as HTMLInputElement).style.setProperty('--value', `${value}%`);
+          }}
+          style={{ '--value': `${pctCanalProprio}%` } as React.CSSProperties}
         />
         <SliderMarks>
           <span>0%</span>
@@ -158,7 +175,7 @@ const SliderLabel = styled.div`
 
 const SliderValue = styled.span`
   font-weight: 600;
-  color: #792810;
+  color: #92400e;
   font-size: 1rem;
 `;
 
@@ -166,25 +183,44 @@ const Slider = styled.input`
   width: 100%;
   height: 8px;
   border-radius: 4px;
-  background: #e2e8f0;
+  background: linear-gradient(to right, #92400e 0%, #92400e var(--value, 50%), #e2e8f0 var(--value, 50%), #e2e8f0 100%);
   outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  
+  &::-webkit-slider-runnable-track {
+    background: transparent;
+    height: 8px;
+    border-radius: 4px;
+  }
+  
+  &::-moz-range-track {
+    background: transparent;
+    height: 8px;
+    border-radius: 4px;
+  }
   
   &::-webkit-slider-thumb {
+    -webkit-appearance: none;
     appearance: none;
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: #792810;
+    background: #92400e;
     cursor: pointer;
+    margin-top: -6px;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
   
   &::-moz-range-thumb {
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: #792810;
+    background: #92400e;
     cursor: pointer;
-    border: none;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
 `;
 

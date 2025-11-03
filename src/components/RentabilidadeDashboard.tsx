@@ -26,6 +26,7 @@ const RentabilidadeDashboard: React.FC = () => {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [granularidadeAtual, setGranularidadeAtual] = useState<'dia' | 'semana' | 'mes'>('mes');
   const [kpis, setKpis] = useState<any | null>(null);
   const [waterfall, setWaterfall] = useState<any | null>(null);
   const [margens, setMargens] = useState<any[]>([]);
@@ -57,7 +58,7 @@ const RentabilidadeDashboard: React.FC = () => {
           apiService.getRentabilidadeMargensPorPlataforma({ inicio, fim }),
           apiService.getRentabilidadeCanaisVsMarketplace({ inicio, fim }),
           apiService.getRentabilidadePorTipo({ inicio, fim }),
-          apiService.getRentabilidadeEvolucaoTemporal({ granularidade: 'mes', inicio, fim }),
+            apiService.getRentabilidadeEvolucaoTemporal({ granularidade: 'dia', inicio, fim }),
           apiService.getRentabilidadeROIPorPlataforma({ inicio, fim })
         ]);
         
@@ -84,6 +85,8 @@ const RentabilidadeDashboard: React.FC = () => {
     function onDateRange(e: any) {
       const { inicio, fim, granularidade } = e.detail || {};
       if (!inicio || !fim) return;
+      const gran = (granularidade === 'dia' || granularidade === 'mes') ? granularidade : 'mes';
+      setGranularidadeAtual(gran);
       (async () => {
         try {
           setLoading(true);
@@ -93,7 +96,7 @@ const RentabilidadeDashboard: React.FC = () => {
             apiService.getRentabilidadeMargensPorPlataforma({ inicio, fim }),
             apiService.getRentabilidadeCanaisVsMarketplace({ inicio, fim }),
             apiService.getRentabilidadePorTipo({ inicio, fim }),
-            apiService.getRentabilidadeEvolucaoTemporal({ granularidade: granularidade || 'mes', inicio, fim }),
+            apiService.getRentabilidadeEvolucaoTemporal({ granularidade: gran, inicio, fim }),
             apiService.getRentabilidadeROIPorPlataforma({ inicio, fim })
           ]);
           setKpis(k);
@@ -138,7 +141,7 @@ const RentabilidadeDashboard: React.FC = () => {
         title: 'Receita Líquida',
         value: currency.format(kpis.receita_liquida || 0),
         icon: <FiDollarSign />, 
-        color: 'blue' as const
+        color: 'green' as const
       },
       {
         title: 'Margem Líquida',
@@ -173,23 +176,24 @@ const RentabilidadeDashboard: React.FC = () => {
         </KPISection>
 
         <SecaoGraficos>
-          <GradeGraficos>
-            <ContainerGrafico>
-              <CabecalhoGrafico>
-                <TituloGrafico>Impacto das Comissões na Receita</TituloGrafico>
-                <SubtituloGrafico>Gráfico de cascata: Receita bruta → Comissões → Receita líquida</SubtituloGrafico>
-              </CabecalhoGrafico>
-              {waterfall ? <WaterfallChart data={waterfall} /> : <PlaceholderGrafico><TextoPlaceholder>Sem dados</TextoPlaceholder></PlaceholderGrafico>}
-            </ContainerGrafico>
+          {/* 1ª Linha: Evolução da Rentabilidade ao Longo do Tempo (linha inteira) */}
+          <ContainerGrafico>
+            <CabecalhoGrafico>
+              <TituloGrafico>Evolução da Rentabilidade ao Longo do Tempo</TituloGrafico>
+              <SubtituloGrafico>Receita bruta, comissões, receita líquida e margem % mensal</SubtituloGrafico>
+            </CabecalhoGrafico>
+            {evolucao.length ? (
+              <EvolucaoTemporalRentabilidadeChart 
+                data={evolucao} 
+                granularidade={granularidadeAtual || 'mes'} 
+              />
+            ) : (
+              <PlaceholderGrafico><TextoPlaceholder>Sem dados</TextoPlaceholder></PlaceholderGrafico>
+            )}
+          </ContainerGrafico>
 
-            <ContainerGrafico>
-              <CabecalhoGrafico>
-                <TituloGrafico>Margens por Plataforma</TituloGrafico>
-                <SubtituloGrafico>Margem % por plataforma (destaque: canais próprios 100%)</SubtituloGrafico>
-              </CabecalhoGrafico>
-              {margens.length ? <MargensPorPlataformaChart data={margens} /> : <PlaceholderGrafico><TextoPlaceholder>Sem dados</TextoPlaceholder></PlaceholderGrafico>}
-            </ContainerGrafico>
-
+          {/* 2ª Linha: Canais Próprios vs Marketplaces, Simulação e ROI */}
+          <GradeGraficosLinha2>
             <ContainerGrafico>
               <CabecalhoGrafico>
                 <TituloGrafico>Rentabilidade: Canais Próprios vs Marketplaces</TituloGrafico>
@@ -212,6 +216,17 @@ const RentabilidadeDashboard: React.FC = () => {
 
             <ContainerGrafico>
               <CabecalhoGrafico>
+                <TituloGrafico>ROI por Plataforma</TituloGrafico>
+                <SubtituloGrafico>Investimento (comissão) vs Retorno (receita líquida)</SubtituloGrafico>
+              </CabecalhoGrafico>
+              {roi.length ? <ROIPorPlataformaChart data={roi} /> : <PlaceholderGrafico><TextoPlaceholder>Sem dados</TextoPlaceholder></PlaceholderGrafico>}
+            </ContainerGrafico>
+          </GradeGraficosLinha2>
+
+          {/* 3ª Linha: Rentabilidade por Tipo, Impacto das Comissões e Margens */}
+          <GradeGraficosLinha3>
+            <ContainerGrafico>
+              <CabecalhoGrafico>
                 <TituloGrafico>Rentabilidade por Tipo de Pedido</TituloGrafico>
                 <SubtituloGrafico>Família, Combo, Prato único: Receita e margem</SubtituloGrafico>
               </CabecalhoGrafico>
@@ -220,20 +235,20 @@ const RentabilidadeDashboard: React.FC = () => {
 
             <ContainerGrafico>
               <CabecalhoGrafico>
-                <TituloGrafico>Evolução da Rentabilidade ao Longo do Tempo</TituloGrafico>
-                <SubtituloGrafico>Receita bruta, comissões, receita líquida e margem % mensal</SubtituloGrafico>
+                <TituloGrafico>Impacto das Comissões na Receita</TituloGrafico>
+                <SubtituloGrafico>Receita bruta → Comissões → Receita líquida</SubtituloGrafico>
               </CabecalhoGrafico>
-              {evolucao.length ? <EvolucaoTemporalRentabilidadeChart data={evolucao} /> : <PlaceholderGrafico><TextoPlaceholder>Sem dados</TextoPlaceholder></PlaceholderGrafico>}
+              {waterfall ? <WaterfallChart data={waterfall} /> : <PlaceholderGrafico><TextoPlaceholder>Sem dados</TextoPlaceholder></PlaceholderGrafico>}
             </ContainerGrafico>
 
             <ContainerGrafico>
-              <CabecalhoGrafico>
-                <TituloGrafico>ROI por Plataforma</TituloGrafico>
-                <SubtituloGrafico>Investimento (comissão) vs Retorno (receita líquida)</SubtituloGrafico>
-              </CabecalhoGrafico>
-              {roi.length ? <ROIPorPlataformaChart data={roi} /> : <PlaceholderGrafico><TextoPlaceholder>Sem dados</TextoPlaceholder></PlaceholderGrafico>}
+            <CabecalhoGrafico>
+              <TituloGrafico>Margens por Plataforma</TituloGrafico>
+              <SubtituloGrafico>Margem % por plataforma</SubtituloGrafico>
+            </CabecalhoGrafico>
+              {margens.length ? <MargensPorPlataformaChart data={margens} /> : <PlaceholderGrafico><TextoPlaceholder>Sem dados</TextoPlaceholder></PlaceholderGrafico>}
             </ContainerGrafico>
-          </GradeGraficos>
+          </GradeGraficosLinha3>
         </SecaoGraficos>
       </DashboardContainer>
     </Layout>
@@ -294,6 +309,28 @@ const GradeGraficos = styled.div`
   }
 
   @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+`;
+
+const GradeGraficosLinha2 = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+`;
+
+const GradeGraficosLinha3 = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+
+  @media (max-width: 1200px) {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
