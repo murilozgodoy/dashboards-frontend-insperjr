@@ -2,13 +2,13 @@ import React from 'react';
 import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, Legend } from 'recharts';
 import { CHART_COLORS } from '../config/colors';
 
-interface PedidosPorDistanciaChartProps {
-  data: { faixa: string; pedidos: number; satisfacao_media?: number; receita_media?: number }[];
+interface ReceitaTicketDistanciaProps {
+  data: { faixa: string; receita: number; ticket_medio?: number }[];
 }
 
 const currency = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
-const PedidosPorDistanciaChart: React.FC<PedidosPorDistanciaChartProps> = ({ data }) => {
+const ReceitaTicketMedioPorDistanciaChart: React.FC<ReceitaTicketDistanciaProps> = ({ data }) => {
   
   return (
     <ResponsiveContainer width="100%" height={350}>
@@ -21,15 +21,12 @@ const PedidosPorDistanciaChart: React.FC<PedidosPorDistanciaChartProps> = ({ dat
           dataKey="faixa" 
           tick={{ fontSize: 12 }}
         />
-        <YAxis yAxisId="left" tick={{ fontSize: 12 }} />
+        <YAxis yAxisId="left" tick={{ fontSize: 12 }} tickFormatter={(value) => currency.format(value)} />
         <YAxis 
           yAxisId="right" 
           orientation="right" 
           tick={{ fontSize: 12 }}
-          tickFormatter={(value: any) => {
-            // Satisfação normalmente 0-5
-            return value.toFixed(1);
-          }}
+          tickFormatter={(value: any) => currency.format(value)}
         />
         <Tooltip 
           contentStyle={{ 
@@ -39,23 +36,23 @@ const PedidosPorDistanciaChart: React.FC<PedidosPorDistanciaChartProps> = ({ dat
             padding: '8px'
           }}
           formatter={(value: any, name: string) => {
-            if (name === 'pedidos') return [`${value} pedidos`, 'Volume'];
-            if (name === 'satisfacao_media') return [value.toFixed(2), 'Satisfação Média'];
+            if (name === 'receita') return [currency.format(value), 'Receita'];
+            if (name === 'ticket_medio') return [currency.format(value), 'Ticket Médio'];
             return value;
           }}
         />
         <Legend />
-        <Bar yAxisId="left" dataKey="pedidos" name="Volume de Pedidos" fill={CHART_COLORS.amarelo} radius={[8, 8, 0, 0]}>
+        <Bar yAxisId="left" dataKey="receita" name="Receita" fill={CHART_COLORS.amarelo} radius={[8, 8, 0, 0]}>
           {data.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={CHART_COLORS.amarelo} />
           ))}
         </Bar>
-        {data.some(d => d.satisfacao_media !== undefined) && (
+        {data.some(d => d.ticket_medio !== undefined) && (
           <Line 
             yAxisId="right" 
             type="monotone" 
-            dataKey="satisfacao_media" 
-            name="Satisfação Média" 
+            dataKey="ticket_medio" 
+            name="Ticket Médio" 
             stroke={CHART_COLORS.marrom} 
             strokeWidth={3}
             dot={{ fill: CHART_COLORS.marrom, r: 4 }}
@@ -66,6 +63,5 @@ const PedidosPorDistanciaChart: React.FC<PedidosPorDistanciaChartProps> = ({ dat
   );
 };
 
-export default PedidosPorDistanciaChart;
-
+export default ReceitaTicketMedioPorDistanciaChart;
 

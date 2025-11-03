@@ -4,15 +4,12 @@ import Layout from './Layout';
 import { apiService } from '../services/api';
 
 import VolumePorBairroChart from './VolumePorBairroChart';
-import ReceitaPorBairroChart from './ReceitaPorBairroChart';
 import TicketMedioPorBairroChart from './TicketMedioPorBairroChart';
-import SatisfacaoPorBairroChart from './SatisfacaoPorBairroChart';
-import DistanciaMediaPorBairroChart from './DistanciaMediaPorBairroChart';
 import EficienciaPorBairroChart from './EficienciaPorBairroChart';
 import PedidosPorDistanciaChart from './PedidosPorDistanciaChart';
-import SatisfacaoPorDistanciaChart from './SatisfacaoPorDistanciaChart';
-import ValorPorDistanciaChart from './ValorPorDistanciaChart';
+import ReceitaTicketMedioPorDistanciaChart from './ReceitaTicketMedioPorDistanciaChart';
 import PlataformasPorBairroSelector from './PlataformasPorBairroSelector';
+import TabelaReceitaDistancia from './TabelaReceitaDistancia';
 
 const GeograficaDashboard: React.FC = () => {
   const [defaultInicio, setDefaultInicio] = useState<string | null>(null);
@@ -21,17 +18,14 @@ const GeograficaDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  const [volumeData, setVolumeData] = useState<{ bairro: string; volume: number }[]>([]);
-  const [receitaData, setReceitaData] = useState<{ bairro: string; receita: number }[]>([]);
+  const [volumeData, setVolumeData] = useState<{ bairro: string; volume: number; satisfacao?: number }[]>([]);
   const [ticketMedioData, setTicketMedioData] = useState<{ bairro: string; ticket_medio: number }[]>([]);
-  const [satisfacaoData, setSatisfacaoData] = useState<{ bairro: string; satisfacao: number }[]>([]);
-  const [distanciaData, setDistanciaData] = useState<{ bairro: string; distancia_media: number }[]>([]);
   const [eficienciaData, setEficienciaData] = useState<{ bairro: string; eficiencia: number }[]>([]);
+  const [receitaDistanciaData, setReceitaDistanciaData] = useState<{ bairro: string; receita: number; distancia_media?: number }[]>([]);
   
   // Estados para análise por distância
-  const [pedidosDistanciaData, setPedidosDistanciaData] = useState<{ faixa: string; pedidos: number }[]>([]);
-  const [satisfacaoDistanciaData, setSatisfacaoDistanciaData] = useState<{ faixa: string; satisfacao: number }[]>([]);
-  const [valorDistanciaData, setValorDistanciaData] = useState<{ faixa: string; valor: number }[]>([]);
+  const [pedidosDistanciaData, setPedidosDistanciaData] = useState<{ faixa: string; pedidos: number; satisfacao_media?: number }[]>([]);
+  const [receitaTicketDistanciaData, setReceitaTicketDistanciaData] = useState<{ faixa: string; receita: number; ticket_medio?: number }[]>([]);
 
   useEffect(() => {
     let mounted = true;
@@ -51,29 +45,23 @@ const GeograficaDashboard: React.FC = () => {
           setDefaultFim(fim);
         }
         
-        const [volume, receita, ticketMedio, satisfacao, distancia, eficiencia, pedidosDist, satisfacaoDist, valorDist] = await Promise.all([
-          apiService.getGeografiaVolumePorBairro({ inicio, fim, top_n: 20 }),
-          apiService.getGeografiaReceitaPorBairro({ inicio, fim, top_n: 20 }),
+        const [volume, ticketMedio, eficiencia, receitaDist, pedidosDist, receitaTicketDist] = await Promise.all([
+          apiService.getGeografiaVolumeCompletoPorBairro({ inicio, fim, top_n: 20 }),
           apiService.getGeografiaTicketMedioPorBairro({ inicio, fim, top_n: 20 }),
-          apiService.getGeografiaSatisfacaoPorBairro({ inicio, fim, top_n: 20 }),
-          apiService.getGeografiaDistanciaMediaPorBairro({ inicio, fim, top_n: 20 }),
           apiService.getGeografiaEficienciaPorBairro({ inicio, fim, top_n: 20 }),
-          apiService.getGeografiaPedidosPorDistancia({ inicio, fim }),
-          apiService.getGeografiaSatisfacaoPorDistancia({ inicio, fim }),
-          apiService.getGeografiaValorPorDistancia({ inicio, fim })
+          apiService.getGeografiaReceitaDistanciaPorBairro({ inicio, fim, top_n: 20 }),
+          apiService.getGeografiaPedidosCompletoPorDistancia({ inicio, fim }),
+          apiService.getGeografiaReceitaTicketPorDistancia({ inicio, fim })
         ]);
         
         if (!mounted) return;
         
         setVolumeData(volume.dados);
-        setReceitaData(receita.dados);
         setTicketMedioData(ticketMedio.dados);
-        setSatisfacaoData(satisfacao.dados);
-        setDistanciaData(distancia.dados);
         setEficienciaData(eficiencia.dados);
+        setReceitaDistanciaData(receitaDist.dados);
         setPedidosDistanciaData(pedidosDist.dados);
-        setSatisfacaoDistanciaData(satisfacaoDist.dados);
-        setValorDistanciaData(valorDist.dados);
+        setReceitaTicketDistanciaData(receitaTicketDist.dados);
         setError(null);
       } catch (e: any) {
         setError(e?.message || 'Erro ao carregar análise geográfica');
@@ -92,27 +80,21 @@ const GeograficaDashboard: React.FC = () => {
       (async () => {
         try {
           setLoading(true);
-          const [volume, receita, ticketMedio, satisfacao, distancia, eficiencia, pedidosDist, satisfacaoDist, valorDist] = await Promise.all([
-            apiService.getGeografiaVolumePorBairro({ inicio, fim, top_n: 20 }),
-            apiService.getGeografiaReceitaPorBairro({ inicio, fim, top_n: 20 }),
+          const [volume, ticketMedio, eficiencia, receitaDist, pedidosDist, receitaTicketDist] = await Promise.all([
+            apiService.getGeografiaVolumeCompletoPorBairro({ inicio, fim, top_n: 20 }),
             apiService.getGeografiaTicketMedioPorBairro({ inicio, fim, top_n: 20 }),
-            apiService.getGeografiaSatisfacaoPorBairro({ inicio, fim, top_n: 20 }),
-            apiService.getGeografiaDistanciaMediaPorBairro({ inicio, fim, top_n: 20 }),
             apiService.getGeografiaEficienciaPorBairro({ inicio, fim, top_n: 20 }),
-            apiService.getGeografiaPedidosPorDistancia({ inicio, fim }),
-            apiService.getGeografiaSatisfacaoPorDistancia({ inicio, fim }),
-            apiService.getGeografiaValorPorDistancia({ inicio, fim })
+            apiService.getGeografiaReceitaDistanciaPorBairro({ inicio, fim, top_n: 20 }),
+            apiService.getGeografiaPedidosCompletoPorDistancia({ inicio, fim }),
+            apiService.getGeografiaReceitaTicketPorDistancia({ inicio, fim })
           ]);
           
           setVolumeData(volume.dados);
-          setReceitaData(receita.dados);
           setTicketMedioData(ticketMedio.dados);
-          setSatisfacaoData(satisfacao.dados);
-          setDistanciaData(distancia.dados);
           setEficienciaData(eficiencia.dados);
+          setReceitaDistanciaData(receitaDist.dados);
           setPedidosDistanciaData(pedidosDist.dados);
-          setSatisfacaoDistanciaData(satisfacaoDist.dados);
-          setValorDistanciaData(valorDist.dados);
+          setReceitaTicketDistanciaData(receitaTicketDist.dados);
           setError(null);
         } catch (e: any) {
           setError(e?.message || 'Erro ao carregar análise geográfica');
@@ -135,79 +117,55 @@ const GeograficaDashboard: React.FC = () => {
         
         <SecaoGraficos>
           <SectionTitle>Análise por Bairro</SectionTitle>
-          <GradeGraficos>
-            <ContainerGrafico>
+          <GradeGraficosBairro>
+            <ContainerGraficoFullWidth>
               <CabecalhoGrafico>
                 <TituloGrafico>Volume de Pedidos por Bairro</TituloGrafico>
-                <SubtituloGrafico>Top 20 bairros com mais pedidos</SubtituloGrafico>
+                <SubtituloGrafico>Bairros com mais pedidos</SubtituloGrafico>
               </CabecalhoGrafico>
               {volumeData.length ? (
                 <VolumePorBairroChart data={volumeData} />
               ) : (
                 <PlaceholderGrafico><TextoPlaceholder>Sem dados</TextoPlaceholder></PlaceholderGrafico>
               )}
-            </ContainerGrafico>
+            </ContainerGraficoFullWidth>
 
-            <ContainerGrafico>
-              <CabecalhoGrafico>
-                <TituloGrafico>Receita por Bairro</TituloGrafico>
-                <SubtituloGrafico>Top 20 bairros com maior receita</SubtituloGrafico>
-              </CabecalhoGrafico>
-              {receitaData.length ? (
-                <ReceitaPorBairroChart data={receitaData} />
-              ) : (
-                <PlaceholderGrafico><TextoPlaceholder>Sem dados</TextoPlaceholder></PlaceholderGrafico>
-              )}
-            </ContainerGrafico>
-
-            <ContainerGrafico>
+            <ContainerGraficoLeft>
               <CabecalhoGrafico>
                 <TituloGrafico>Ticket Médio por Bairro</TituloGrafico>
-                <SubtituloGrafico>Top 20 bairros com maior ticket médio</SubtituloGrafico>
+                <SubtituloGrafico>Bairros com maior ticket médio</SubtituloGrafico>
               </CabecalhoGrafico>
               {ticketMedioData.length ? (
                 <TicketMedioPorBairroChart data={ticketMedioData} />
               ) : (
                 <PlaceholderGrafico><TextoPlaceholder>Sem dados</TextoPlaceholder></PlaceholderGrafico>
               )}
-            </ContainerGrafico>
+            </ContainerGraficoLeft>
 
-            <ContainerGrafico>
-              <CabecalhoGrafico>
-                <TituloGrafico>Satisfação por Bairro</TituloGrafico>
-                <SubtituloGrafico>Top 20 bairros com maior satisfação</SubtituloGrafico>
-              </CabecalhoGrafico>
-              {satisfacaoData.length ? (
-                <SatisfacaoPorBairroChart data={satisfacaoData} />
-              ) : (
-                <PlaceholderGrafico><TextoPlaceholder>Sem dados</TextoPlaceholder></PlaceholderGrafico>
-              )}
-            </ContainerGrafico>
-
-            <ContainerGrafico>
-              <CabecalhoGrafico>
-                <TituloGrafico>Distância Média por Bairro</TituloGrafico>
-                <SubtituloGrafico>Top 20 bairros com maior distância</SubtituloGrafico>
-              </CabecalhoGrafico>
-              {distanciaData.length ? (
-                <DistanciaMediaPorBairroChart data={distanciaData} />
-              ) : (
-                <PlaceholderGrafico><TextoPlaceholder>Sem dados</TextoPlaceholder></PlaceholderGrafico>
-              )}
-            </ContainerGrafico>
-
-            <ContainerGrafico>
+            <ContainerGraficoLeft>
               <CabecalhoGrafico>
                 <TituloGrafico>Eficiência por Bairro (Receita/Distância)</TituloGrafico>
-                <SubtituloGrafico>Top 20 bairros com maior eficiência</SubtituloGrafico>
+                <SubtituloGrafico>Bairros com maior eficiência</SubtituloGrafico>
               </CabecalhoGrafico>
               {eficienciaData.length ? (
                 <EficienciaPorBairroChart data={eficienciaData} />
               ) : (
                 <PlaceholderGrafico><TextoPlaceholder>Sem dados</TextoPlaceholder></PlaceholderGrafico>
               )}
-            </ContainerGrafico>
-          </GradeGraficos>
+            </ContainerGraficoLeft>
+
+            <ContainerGraficoRight>
+              <CabecalhoGrafico>
+                <TituloGrafico>Tabela Comparativa: Receita e Distância por Bairros</TituloGrafico>
+                <SubtituloGrafico>Top 20 bairros com maior receita</SubtituloGrafico>
+              </CabecalhoGrafico>
+              {receitaDistanciaData.length ? (
+                <TabelaReceitaDistancia data={receitaDistanciaData} />
+              ) : (
+                <PlaceholderGrafico><TextoPlaceholder>Sem dados</TextoPlaceholder></PlaceholderGrafico>
+              )}
+            </ContainerGraficoRight>
+          </GradeGraficosBairro>
         </SecaoGraficos>
 
         <SecaoGraficos>
@@ -231,7 +189,7 @@ const GeograficaDashboard: React.FC = () => {
             <ContainerGrafico>
               <CabecalhoGrafico>
                 <TituloGrafico>Pedidos por Faixa de Distância</TituloGrafico>
-                <SubtituloGrafico>Volume de pedidos por faixa de distância</SubtituloGrafico>
+                <SubtituloGrafico>Volume de pedidos e satisfação média por faixa de distância</SubtituloGrafico>
               </CabecalhoGrafico>
               {pedidosDistanciaData.length ? (
                 <PedidosPorDistanciaChart data={pedidosDistanciaData} />
@@ -242,23 +200,11 @@ const GeograficaDashboard: React.FC = () => {
 
             <ContainerGrafico>
               <CabecalhoGrafico>
-                <TituloGrafico>Satisfação por Distância</TituloGrafico>
-                <SubtituloGrafico>Satisfação média por faixa de distância</SubtituloGrafico>
+                <TituloGrafico>Receita e Ticket Médio por Faixa de Distância</TituloGrafico>
+                <SubtituloGrafico>Receita total e ticket médio por faixa de distância</SubtituloGrafico>
               </CabecalhoGrafico>
-              {satisfacaoDistanciaData.length ? (
-                <SatisfacaoPorDistanciaChart data={satisfacaoDistanciaData} />
-              ) : (
-                <PlaceholderGrafico><TextoPlaceholder>Sem dados</TextoPlaceholder></PlaceholderGrafico>
-              )}
-            </ContainerGrafico>
-
-            <ContainerGrafico>
-              <CabecalhoGrafico>
-                <TituloGrafico>Receita por Distância</TituloGrafico>
-                <SubtituloGrafico>Valor total por faixa de distância</SubtituloGrafico>
-              </CabecalhoGrafico>
-              {valorDistanciaData.length ? (
-                <ValorPorDistanciaChart data={valorDistanciaData} />
+              {receitaTicketDistanciaData.length ? (
+                <ReceitaTicketMedioPorDistanciaChart data={receitaTicketDistanciaData} />
               ) : (
                 <PlaceholderGrafico><TextoPlaceholder>Sem dados</TextoPlaceholder></PlaceholderGrafico>
               )}
@@ -307,6 +253,27 @@ const GradeGraficos = styled.div`
   }
 `;
 
+const GradeGraficosBairro = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+`;
+
 const ContainerGrafico = styled.div`
   background: white;
   border-radius: 16px;
@@ -324,6 +291,24 @@ const ContainerGrafico = styled.div`
     padding: 0.75rem;
     min-height: 300px;
     border-radius: 12px;
+  }
+`;
+
+const ContainerGraficoFullWidth = styled(ContainerGrafico)`
+  grid-column: 1 / -1;
+`;
+
+const ContainerGraficoLeft = styled(ContainerGrafico)`
+  grid-column: 1;
+`;
+
+const ContainerGraficoRight = styled(ContainerGrafico)`
+  grid-column: 2;
+  grid-row: 2 / 4;
+  
+  @media (max-width: 1024px) {
+    grid-column: 1;
+    grid-row: auto;
   }
 `;
 

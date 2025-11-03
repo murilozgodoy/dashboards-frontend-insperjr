@@ -211,6 +211,52 @@ export const apiService = {
     return response.json();
   },
 
+  async getGeografiaPedidosCompletoPorDistancia(params?: { inicio?: string; fim?: string }): Promise<{
+    dados: { faixa: string; pedidos: number; satisfacao_media?: number; receita_media?: number }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/geografica/pedidos-completo-por-distancia${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar dados completos por distância');
+    return response.json();
+  },
+
+  async getGeografiaVolumeCompletoPorBairro(params?: { inicio?: string; fim?: string; top_n?: number }): Promise<{
+    dados: { bairro: string; volume: number; satisfacao?: number }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    if (params?.top_n) qs.set('top_n', params.top_n.toString());
+    const response = await fetch(`${API_BASE_URL}/api/geografica/volume-completo-por-bairro${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar volume completo por bairro');
+    return response.json();
+  },
+
+  async getGeografiaReceitaDistanciaPorBairro(params?: { inicio?: string; fim?: string; top_n?: number }): Promise<{
+    dados: { bairro: string; receita: number; distancia_media?: number }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    if (params?.top_n) qs.set('top_n', params.top_n.toString());
+    const response = await fetch(`${API_BASE_URL}/api/geografica/receita-distancia-por-bairro${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar receita e distância por bairro');
+    return response.json();
+  },
+
+  async getGeografiaReceitaTicketPorDistancia(params?: { inicio?: string; fim?: string }): Promise<{
+    dados: { faixa: string; receita: number; ticket_medio?: number }[];
+  }> {
+    const qs = new URLSearchParams();
+    if (params?.inicio) qs.set('inicio', params.inicio);
+    if (params?.fim) qs.set('fim', params.fim);
+    const response = await fetch(`${API_BASE_URL}/api/geografica/receita-ticket-por-distancia${qs.toString() ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error('Erro ao buscar receita e ticket médio por distância');
+    return response.json();
+  },
+
   // ANÁLISE DE PLATAFORMAS POR BAIRRO
   async getGeografiaListaBairros(params?: { inicio?: string; fim?: string }): Promise<{
     bairros: { bairro: string; total_pedidos: number }[];
