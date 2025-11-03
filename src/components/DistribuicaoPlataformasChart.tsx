@@ -1,6 +1,23 @@
 import React from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend, BarChart, XAxis, YAxis, CartesianGrid, Bar } from 'recharts';
-import { CHART_COLORS_ARRAY, getChartColor } from '../config/colors';
+
+// Cores das plataformas (mesmas do gráfico "Plataformas Utilizadas por Bairro")
+const CORES_PLATAFORMAS: { [key: string]: string } = {
+  'ifood': '#EA1D2C',
+  'rappi': '#FF6B00',
+  'site_proprio': '#3b82f6',
+  'whatsapp': '#25D366'
+};
+
+const getCorPlataforma = (nome: string): string => {
+  const nomeLower = nome.toLowerCase().replace(/\s+/g, '_');
+  // Tentar diferentes variações do nome
+  if (nomeLower.includes('ifood')) return CORES_PLATAFORMAS['ifood'];
+  if (nomeLower.includes('rappi')) return CORES_PLATAFORMAS['rappi'];
+  if (nomeLower.includes('site') || nomeLower.includes('proprio')) return CORES_PLATAFORMAS['site_proprio'];
+  if (nomeLower.includes('whatsapp') || nomeLower.includes('whats')) return CORES_PLATAFORMAS['whatsapp'];
+  return '#718096'; // Cor padrão se não encontrar
+};
 
 const currency = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
@@ -44,8 +61,8 @@ const DistribuicaoPlataformasChart: React.FC<Props> = ({ data, mode = 'pie' }) =
           />
           <Legend />
           <Bar dataKey={data[0]?.receita ? "receita" : "pedidos"} name={data[0]?.receita ? "Receita" : "Pedidos"}>
-            {data.map((_, idx) => (
-              <Cell key={idx} fill={getChartColor(idx)} />
+            {data.map((item, idx) => (
+              <Cell key={idx} fill={getCorPlataforma(item.nome)} />
             ))}
           </Bar>
         </BarChart>
@@ -56,9 +73,15 @@ const DistribuicaoPlataformasChart: React.FC<Props> = ({ data, mode = 'pie' }) =
   return (
     <ResponsiveContainer width="100%" height={320}>
       <PieChart>
-        <Pie data={data} dataKey="pct" nameKey="nome" outerRadius={110} label>
-          {data.map((_, idx) => (
-            <Cell key={idx} fill={getChartColor(idx)} />
+        <Pie 
+          data={data} 
+          dataKey="pct" 
+          nameKey="nome" 
+          outerRadius={110} 
+          label={(entry: any) => `${(entry.pct * 100).toFixed(1)}%`}
+        >
+          {data.map((item, idx) => (
+            <Cell key={idx} fill={getCorPlataforma(item.nome)} />
           ))}
         </Pie>
         <Tooltip formatter={(v: any) => `${(v * 100).toFixed(1)}%`} />
