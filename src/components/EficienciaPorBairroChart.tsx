@@ -1,6 +1,6 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { getChartColor } from '../config/colors';
+import { CHART_COLORS } from '../config/colors';
 
 interface EficienciaPorBairroChartProps {
   data: { bairro: string; eficiencia: number }[];
@@ -34,9 +34,9 @@ const EficienciaPorBairroChart: React.FC<EficienciaPorBairroChartProps> = ({ dat
           }}
           formatter={(value: number) => [`${currency.format(value)}/km`, 'Eficiência']}
         />
-        <Bar dataKey="eficiencia" radius={[8, 8, 0, 0]}>
+        <Bar dataKey="eficiencia" radius={[8, 8, 0, 0]} fill={CHART_COLORS.azul}>
           {data.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={getChartColor(index)} />
+            <Cell key={`cell-${index}`} fill={CHART_COLORS.azul} />
           ))}
         </Bar>
       </BarChart>
