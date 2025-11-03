@@ -108,7 +108,7 @@ const Dashboard: React.FC = () => {
         title: 'Pedidos',
         value: (kpis.pedidos_totais || 0).toLocaleString('pt-BR'),
         change: { value: Number((kpis.pedidos_variacao_pct || 0).toFixed(1)), period: 'vs. mês anterior' },
-        icon: <FiShoppingCart />, color: 'blue' as const
+        icon: <FiShoppingCart />, color: 'orange' as const
       },
       {
         title: 'Ticket Médio',
@@ -120,7 +120,7 @@ const Dashboard: React.FC = () => {
         title: 'Satisfação Média',
         value: (kpis.satisfacao_media || 0).toFixed(2).replace('.', ','),
         change: { value: Number(((kpis.satisfacao_taxa_alta || 0) * 100).toFixed(1)), period: 'notas 4-5' },
-        icon: <FiUsers />, color: 'purple' as const
+        icon: <FiUsers />, color: 'green' as const
       }
     ];
   }, [kpis]);

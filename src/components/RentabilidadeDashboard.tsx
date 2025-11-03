@@ -161,7 +161,7 @@ const RentabilidadeDashboard: React.FC = () => {
         {error && <div style={{ color: '#b91c1c', background: '#fee2e2', padding: 12, borderRadius: 8 }}>{error}</div>}
         
         <KPISection>
-          <SectionTitle>KPIs Financeiros</SectionTitle>
+          <SectionTitle>Indicadores de Eficiência</SectionTitle>
           <KPIGrid>
             {kpiCards.map((kpi, index) => (
               <KPICard
