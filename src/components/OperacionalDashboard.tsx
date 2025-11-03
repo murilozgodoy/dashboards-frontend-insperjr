@@ -17,6 +17,7 @@ import PrecisaoEtaHoraChart from './PrecisaoEtaHoraChart';
 import TemposPorHoraChart from './TemposPorHoraChart';
 import EstatisticasDetalhadasCard from './EstatisticasDetalhadasCard';
 import AnalisePorPeriodoChart from './AnalisePorPeriodoChart';
+import { CHART_COLORS } from '../config/colors';
 
 const OperacionalDashboard: React.FC = () => {
   const [defaultInicio, setDefaultInicio] = useState<string | null>(null);
@@ -37,10 +38,10 @@ const OperacionalDashboard: React.FC = () => {
   const [estatisticasTempos, setEstatisticasTempos] = useState<{ preparo: any; entrega: any } | null>(null);
   const [outliersDetalhados, setOutliersDetalhados] = useState<any | null>(null);
   const [atrasos, setAtrasos] = useState<any[]>([]);
-  const [mostrarTodosPreparo, setMostrarTodosPreparo] = useState(false);
-  const [mostrarTodosEntrega, setMostrarTodosEntrega] = useState(false);
+  const [tipoOutlier, setTipoOutlier] = useState<'preparo' | 'entrega'>('preparo');
+  const [mostrarTodosOutliers, setMostrarTodosOutliers] = useState(false);
   const [mostrarTodosAtrasos, setMostrarTodosAtrasos] = useState(false);
-  const LIMITE_INICIAL = 10;
+  const LIMITE_INICIAL = 5;
 
   const loadData = async (inicio: string, fim: string, threshold?: number) => {
     const thresholdToUse = threshold !== undefined ? threshold : thresholdAtraso;
@@ -83,8 +84,7 @@ const OperacionalDashboard: React.FC = () => {
       setOutliersDetalhados(outliers);
       setAtrasos(atrasosData.dados);
       //resetar estados de "ver todos" quando dados mudarem
-      setMostrarTodosPreparo(false);
-      setMostrarTodosEntrega(false);
+      setMostrarTodosOutliers(false);
       setMostrarTodosAtrasos(false);
       setError(null);
     } catch (e: any) {
@@ -150,28 +150,28 @@ const OperacionalDashboard: React.FC = () => {
         value: `${kpis.precisao_eta_pct?.toFixed(1) || 0}%`,
         change: undefined,
         icon: <FiCheckCircle />, 
-        color: kpis.precisao_eta_pct >= 80 ? 'green' : kpis.precisao_eta_pct >= 60 ? 'orange' : 'red' as const
+        color: (kpis.precisao_eta_pct ?? 0) >= 80 ? 'green' : (kpis.precisao_eta_pct ?? 0) >= 60 ? 'orange' : 'red' as const
       },
       {
         title: 'Taxa de Atraso',
         value: `${kpis.taxa_atraso_pct?.toFixed(1) || 0}%`,
         change: undefined,
         icon: <FiAlertCircle />, 
-        color: kpis.taxa_atraso_pct < 10 ? 'green' : kpis.taxa_atraso_pct < 20 ? 'orange' : 'red' as const
+        color: (kpis.taxa_atraso_pct ?? 0) < 10 ? 'green' : (kpis.taxa_atraso_pct ?? 0) < 20 ? 'orange' : 'red' as const
       },
       {
-        title: 'Eficiência Média',
-        value: `${kpis.eficiencia_media?.toFixed(2) || 0}`,
-        change: undefined,
-        icon: <FiTrendingUp />, 
-        color: 'blue' as const
-      },
-      {
-        title: 'Desempenho ETA',
-        value: `${kpis.desempenho_eta >= 0 ? '+' : ''}${kpis.desempenho_eta?.toFixed(1) || 0}%`,
+        title: 'Tempo Médio de Entrega',
+        value: `${kpis.tempo_entrega_medio?.toFixed(1) || 0} min`,
         change: undefined,
         icon: <FiClock />, 
-        color: Math.abs(kpis.desempenho_eta) < 5 ? 'green' : Math.abs(kpis.desempenho_eta) < 15 ? 'orange' : 'red' as const
+        color: (kpis.tempo_entrega_medio ?? 0) < 40 ? 'green' : (kpis.tempo_entrega_medio ?? 0) < 60 ? 'orange' : 'red' as const
+      },
+      {
+        title: 'Tempo Médio de Preparo',
+        value: `${kpis.tempo_preparo_medio?.toFixed(1) || 0} min`,
+        change: undefined,
+        icon: <FiClock />, 
+        color: (kpis.tempo_preparo_medio ?? 0) < 20 ? 'green' : (kpis.tempo_preparo_medio ?? 0) < 30 ? 'orange' : 'red' as const
       }
     ];
   }, [kpis, thresholdAtraso]);
@@ -217,6 +217,7 @@ const OperacionalDashboard: React.FC = () => {
                 change={kpi.change}
                 icon={kpi.icon}
                 color={kpi.color}
+                description={kpi.description}
               />
             ))}
           </KPIGrid>
@@ -252,7 +253,8 @@ const OperacionalDashboard: React.FC = () => {
             <ContainerGrafico>
               <CabecalhoGrafico>
                 <TituloGrafico>Distribuição de Tempos de Preparo</TituloGrafico>
-                <SubtituloGrafico>Quantidade de pedidos por faixa de tempo</SubtituloGrafico>
+                <SubtituloGrafico>Quantidade de pedidos por faixa de tempo de preparo</SubtituloGrafico>
+                <LegendaTexto>Mostra a distribuição de pedidos em diferentes intervalos de tempo de preparo (em minutos)</LegendaTexto>
               </CabecalhoGrafico>
               {distribuicaoPreparo.length ? (
                 <DistribuicaoTemposChart data={distribuicaoPreparo} />
@@ -264,7 +266,8 @@ const OperacionalDashboard: React.FC = () => {
             <ContainerGrafico>
               <CabecalhoGrafico>
                 <TituloGrafico>Distribuição de Tempos de Entrega</TituloGrafico>
-                <SubtituloGrafico>Quantidade de pedidos por faixa de tempo</SubtituloGrafico>
+                <SubtituloGrafico>Quantidade de pedidos por faixa de tempo de entrega</SubtituloGrafico>
+                <LegendaTexto>Mostra a distribuição de pedidos em diferentes intervalos de tempo de entrega (em minutos)</LegendaTexto>
               </CabecalhoGrafico>
               {distribuicaoEntrega.length ? (
                 <DistribuicaoTemposChart data={distribuicaoEntrega} />
@@ -297,16 +300,16 @@ const OperacionalDashboard: React.FC = () => {
                 <SubtituloGrafico>Comparação visual entre ETA estimado e tempo real de entrega</SubtituloGrafico>
                 <LegendaCores>
                   <LegendaItem>
-                    <LegendaCor $cor="#10b981" />
-                    <span>Verde: Diferença ≤ 5 min (preciso)</span>
+                    <LegendaCor $cor={CHART_COLORS.marrom} />
+                    <span>Marrom: Diferença ≤ 5 min (preciso)</span>
                   </LegendaItem>
                   <LegendaItem>
-                    <LegendaCor $cor="#ef4444" />
+                    <LegendaCor $cor={CHART_COLORS.vermelho} />
                     <span>Vermelho: Atrasado (&gt; 5 min)</span>
                   </LegendaItem>
                   <LegendaItem>
-                    <LegendaCor $cor="#3b82f6" />
-                    <span>Azul: Antecipado (&lt; -5 min)</span>
+                    <LegendaCor $cor={CHART_COLORS.azul} />
+                    <span>Laranja: Antecipado (&lt; -5 min)</span>
                   </LegendaItem>
                 </LegendaCores>
               </CabecalhoGrafico>
@@ -323,18 +326,18 @@ const OperacionalDashboard: React.FC = () => {
                  <SubtituloGrafico>
                    Percentual de pedidos entregues no prazo por hora do dia.
                  </SubtituloGrafico>
-                 <LegendaCores style={{ marginTop: '0.75rem' }}>
+                 <LegendaCores style={{ marginTop: '0.75rem', flexWrap: 'nowrap' }}>
                    <LegendaItem>
-                     <LegendaCor $cor="#10b981" />
-                     <span>Verde: ≥ 80% (Precisão Boa)</span>
+                     <LegendaCor $cor={CHART_COLORS.marrom} />
+                     <span>Marrom: ≥ 80% (Boa)</span>
                    </LegendaItem>
                    <LegendaItem>
-                     <LegendaCor $cor="#f59e0b" />
-                     <span>Amarelo: 60-79% (Precisão Média)</span>
+                     <LegendaCor $cor={CHART_COLORS.amarelo} />
+                     <span>Amarelo: 60-79% (Média)</span>
                    </LegendaItem>
                    <LegendaItem>
-                     <LegendaCor $cor="#ef4444" />
-                     <span>Vermelho: &lt; 60% (Precisão Baixa)</span>
+                     <LegendaCor $cor={CHART_COLORS.vermelho} />
+                     <span>Vermelho: &lt; 60% (Baixa)</span>
                    </LegendaItem>
                  </LegendaCores>
                </CabecalhoGrafico>
@@ -353,7 +356,7 @@ const OperacionalDashboard: React.FC = () => {
             <ContainerGrafico>
               <CabecalhoGrafico>
                 <TituloGrafico>Análise Operacional por Período</TituloGrafico>
-                <SubtituloGrafico>Métricas de tempos, volume, atrasos e precisão por período do dia</SubtituloGrafico>
+                <SubtituloGrafico>Taxa de atraso, precisão de ETA e volume por período do dia</SubtituloGrafico>
               </CabecalhoGrafico>
               {analisePorPeriodo.length > 0 ? (
                 <AnalisePorPeriodoChart data={analisePorPeriodo} />
@@ -382,103 +385,92 @@ const OperacionalDashboard: React.FC = () => {
               </ResumoOutliers>
             )}
 
-            {outliersDetalhados.outliers_preparo.length > 0 && (
-              <TabelaContainer style={{ marginBottom: '1.5rem' }}>
+            <TabelaContainer>
+              <CabecalhoTabela>
                 <TabelaTitle>
-                  Top Pedidos com Preparo &gt; 30 minutos
-                  {outliersDetalhados.outliers_preparo.length > LIMITE_INICIAL && (
-                    <ContadorTabela>
-                      ({mostrarTodosPreparo ? outliersDetalhados.outliers_preparo.length : LIMITE_INICIAL} de {outliersDetalhados.outliers_preparo.length})
-                    </ContadorTabela>
-                  )}
+                  {tipoOutlier === 'preparo' ? 'Top Pedidos com Preparo > 30 minutos' : 'Top Pedidos com Entrega > 60 minutos'}
+                  {(() => {
+                    const dados = tipoOutlier === 'preparo' ? outliersDetalhados.outliers_preparo : outliersDetalhados.outliers_entrega;
+                    return dados.length > LIMITE_INICIAL && (
+                      <ContadorTabela>
+                        ({mostrarTodosOutliers ? dados.length : LIMITE_INICIAL} de {dados.length})
+                      </ContadorTabela>
+                    );
+                  })()}
                 </TabelaTitle>
-                <Tabela>
-                  <thead>
-                    <Tr>
-                      <Th>Data/Hora</Th>
-                      <Th>Preparo (min)</Th>
-                      <Th>Entrega (min)</Th>
-                      <Th>Distância (km)</Th>
-                      <Th>Hora</Th>
-                      <Th>Bairro</Th>
-                      <Th>Plataforma</Th>
-                      <Th>Modo</Th>
-                    </Tr>
-                  </thead>
-                  <tbody>
-                    {(mostrarTodosPreparo 
-                      ? outliersDetalhados.outliers_preparo 
-                      : outliersDetalhados.outliers_preparo.slice(0, LIMITE_INICIAL)
-                    ).map((outlier: any, index: number) => (
+                <ToggleGroup>
+                  <ToggleButton 
+                    $active={tipoOutlier === 'preparo'}
+                    onClick={() => {
+                      setTipoOutlier('preparo');
+                      setMostrarTodosOutliers(false);
+                    }}
+                  >
+                    Preparo
+                  </ToggleButton>
+                  <ToggleButton 
+                    $active={tipoOutlier === 'entrega'}
+                    onClick={() => {
+                      setTipoOutlier('entrega');
+                      setMostrarTodosOutliers(false);
+                    }}
+                  >
+                    Entrega
+                  </ToggleButton>
+                </ToggleGroup>
+              </CabecalhoTabela>
+              <Tabela>
+                <thead>
+                  <Tr>
+                    <Th>Data/Hora</Th>
+                    <Th>Preparo (min)</Th>
+                    <Th>Entrega (min)</Th>
+                    <Th>Distância (km)</Th>
+                    <Th>Hora</Th>
+                    <Th>Bairro</Th>
+                    <Th>Plataforma</Th>
+                    <Th>Modo</Th>
+                  </Tr>
+                </thead>
+                <tbody>
+                  {(() => {
+                    const dados = tipoOutlier === 'preparo' ? outliersDetalhados.outliers_preparo : outliersDetalhados.outliers_entrega;
+                    const dadosExibidos = mostrarTodosOutliers ? dados : dados.slice(0, LIMITE_INICIAL);
+                    
+                    if (dados.length === 0) {
+                      return (
+                        <Tr>
+                          <Td colSpan={8} style={{ textAlign: 'center', color: '#718096' }}>
+                            Sem outliers para exibir
+                          </Td>
+                        </Tr>
+                      );
+                    }
+                    
+                    return dadosExibidos.map((outlier: any, index: number) => (
                       <Tr key={index}>
                         <Td>{outlier.data ? new Date(outlier.data).toLocaleString('pt-BR') : '-'}</Td>
-                        <Td $isAtraso={true}>{outlier.tempo_preparo.toFixed(0)}</Td>
-                        <Td>{outlier.tempo_entrega.toFixed(0)}</Td>
+                        <Td $isAtraso={tipoOutlier === 'preparo'}>{outlier.tempo_preparo.toFixed(0)}</Td>
+                        <Td $isAtraso={tipoOutlier === 'entrega'}>{outlier.tempo_entrega.toFixed(0)}</Td>
                         <Td>{outlier.distancia_km.toFixed(1)}</Td>
                         <Td>{outlier.hora !== null ? `${outlier.hora}:00` : '-'}</Td>
                         <Td>{outlier.bairro || '-'}</Td>
                         <Td>{outlier.platform || '-'}</Td>
                         <Td>{outlier.modo || '-'}</Td>
                       </Tr>
-                    ))}
-                  </tbody>
-                </Tabela>
-                {outliersDetalhados.outliers_preparo.length > LIMITE_INICIAL && (
-                  <BotaoVerMais onClick={() => setMostrarTodosPreparo(!mostrarTodosPreparo)}>
-                    {mostrarTodosPreparo ? 'Ver menos' : `Ver todos (${outliersDetalhados.outliers_preparo.length})`}
+                    ));
+                  })()}
+                </tbody>
+              </Tabela>
+              {(() => {
+                const dados = tipoOutlier === 'preparo' ? outliersDetalhados.outliers_preparo : outliersDetalhados.outliers_entrega;
+                return dados.length > LIMITE_INICIAL && (
+                  <BotaoVerMais onClick={() => setMostrarTodosOutliers(!mostrarTodosOutliers)}>
+                    {mostrarTodosOutliers ? 'Ver menos' : `Ver todos (${dados.length})`}
                   </BotaoVerMais>
-                )}
-              </TabelaContainer>
-            )}
-
-            {outliersDetalhados.outliers_entrega.length > 0 && (
-              <TabelaContainer>
-                <TabelaTitle>
-                  Top Pedidos com Entrega &gt; 60 minutos
-                  {outliersDetalhados.outliers_entrega.length > LIMITE_INICIAL && (
-                    <ContadorTabela>
-                      ({mostrarTodosEntrega ? outliersDetalhados.outliers_entrega.length : LIMITE_INICIAL} de {outliersDetalhados.outliers_entrega.length})
-                    </ContadorTabela>
-                  )}
-                </TabelaTitle>
-                <Tabela>
-                  <thead>
-                    <Tr>
-                      <Th>Data/Hora</Th>
-                      <Th>Preparo (min)</Th>
-                      <Th>Entrega (min)</Th>
-                      <Th>Distância (km)</Th>
-                      <Th>Hora</Th>
-                      <Th>Bairro</Th>
-                      <Th>Plataforma</Th>
-                      <Th>Modo</Th>
-                    </Tr>
-                  </thead>
-                  <tbody>
-                    {(mostrarTodosEntrega 
-                      ? outliersDetalhados.outliers_entrega 
-                      : outliersDetalhados.outliers_entrega.slice(0, LIMITE_INICIAL)
-                    ).map((outlier: any, index: number) => (
-                      <Tr key={index}>
-                        <Td>{outlier.data ? new Date(outlier.data).toLocaleString('pt-BR') : '-'}</Td>
-                        <Td>{outlier.tempo_preparo.toFixed(0)}</Td>
-                        <Td $isAtraso={true}>{outlier.tempo_entrega.toFixed(0)}</Td>
-                        <Td>{outlier.distancia_km.toFixed(1)}</Td>
-                        <Td>{outlier.hora !== null ? `${outlier.hora}:00` : '-'}</Td>
-                        <Td>{outlier.bairro || '-'}</Td>
-                        <Td>{outlier.platform || '-'}</Td>
-                        <Td>{outlier.modo || '-'}</Td>
-                      </Tr>
-                    ))}
-                  </tbody>
-                </Tabela>
-                {outliersDetalhados.outliers_entrega.length > LIMITE_INICIAL && (
-                  <BotaoVerMais onClick={() => setMostrarTodosEntrega(!mostrarTodosEntrega)}>
-                    {mostrarTodosEntrega ? 'Ver menos' : `Ver todos (${outliersDetalhados.outliers_entrega.length})`}
-                  </BotaoVerMais>
-                )}
-              </TabelaContainer>
-            )}
+                );
+              })()}
+            </TabelaContainer>
           </SecaoGraficos>
         )}
 
@@ -697,6 +689,13 @@ const SubtituloGrafico = styled.p`
   margin: 0;
 `;
 
+const LegendaTexto = styled.p`
+  font-size: 0.75rem;
+  color: #a0aec0;
+  margin: 0.5rem 0 0 0;
+  font-style: italic;
+`;
+
 const LegendaCores = styled.div`
   display: flex;
   gap: 1rem;
@@ -776,14 +775,46 @@ const TabelaContainer = styled.div`
   overflow-x: auto;
 `;
 
+const CabecalhoTabela = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+`;
+
 const TabelaTitle = styled.h4`
   font-size: 1rem;
   font-weight: 600;
   color: #1a202c;
-  margin: 0 0 1rem 0;
+  margin: 0;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  flex: 1;
+`;
+
+const ToggleGroup = styled.div`
+  display: flex;
+  gap: 0.5rem;
+`;
+
+const ToggleButton = styled.button<{ $active: boolean }>`
+  padding: 0.375rem 0.75rem;
+  border: 1px solid ${props => props.$active ? '#792810' : '#e2e8f0'};
+  background-color: ${props => props.$active ? '#792810' : 'white'};
+  color: ${props => props.$active ? 'white' : '#4a5568'};
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: ${props => props.$active ? 600 : 400};
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  &:hover {
+    border-color: #792810;
+    background-color: ${props => props.$active ? '#5C1F0C' : '#f7f1ef'};
+  }
 `;
 
 const ContadorTabela = styled.span`

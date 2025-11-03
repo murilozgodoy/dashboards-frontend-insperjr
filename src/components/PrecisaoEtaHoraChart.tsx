@@ -1,5 +1,6 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { CHART_COLORS } from '../config/colors';
 
 interface PrecisaoEtaHoraChartProps {
   data: { hora: number; precisao_pct: number; total_pedidos: number }[];
@@ -7,9 +8,9 @@ interface PrecisaoEtaHoraChartProps {
 
 const getColor = (precisao: number, totalPedidos: number) => {
   if (totalPedidos === 0) return '#cbd5e0'; // cinza claro
-  if (precisao >= 80) return '#10b981'; // verde
-  if (precisao >= 60) return '#f59e0b'; // amarelo
-  return '#ef4444'; // vermelho
+  if (precisao >= 80) return CHART_COLORS.marrom; // marrom (boa precisão)
+  if (precisao >= 60) return CHART_COLORS.amarelo; // amarelo (média)
+  return CHART_COLORS.vermelho; // vermelho (ruim)
 };
 
 const PrecisaoEtaHoraChart: React.FC<PrecisaoEtaHoraChartProps> = ({ data }) => {
@@ -64,7 +65,7 @@ const PrecisaoEtaHoraChart: React.FC<PrecisaoEtaHoraChartProps> = ({ data }) => 
           }}
         />
         <Bar dataKey="precisao_pct" name="Precisão (%)" radius={[8, 8, 0, 0]}>
-          {data.map((entry, index) => (
+          {sortedData.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={getColor(entry.precisao_pct, entry.total_pedidos)} />
           ))}
         </Bar>

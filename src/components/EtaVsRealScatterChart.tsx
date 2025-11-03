@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { CHART_COLORS } from '../config/colors';
 
 interface EtaVsRealScatterChartProps {
   data: { eta: number; real: number }[];
@@ -17,16 +18,16 @@ const EtaVsRealScatterChart: React.FC<EtaVsRealScatterChartProps> = ({ data }) =
     
     const dataColored = data.map(d => {
       const diff = d.real - d.eta;
-      //verde se estiver próximo da linha (diferença menor uou igual a 5 min)
+      //marrom se estiver próximo da linha (diferença menor ou igual a 5 min) - precisão
       //vermelho se atrasado (real > eta)
-      //aazul se antecipado (real < eta)
-      let color = '#3b82f6';
+      //azul/laranja se antecipado (real < eta)
+      let color = CHART_COLORS.azul;
       if (Math.abs(diff) <= 5) {
-        color = '#10b981'; 
+        color = CHART_COLORS.marrom; 
       } else if (diff > 5) {
-        color = '#ef4444'; 
+        color = CHART_COLORS.vermelho; 
       } else {
-        color = '#3b82f6';
+        color = CHART_COLORS.azul;
       }
       return { ...d, color };
     });

@@ -30,7 +30,7 @@ const PlataformasDashboard: React.FC = () => {
   
   
   const [metric, setMetric] = useState<'receita' | 'pedidos'>('receita');
-  const [granularidade, setGranularidade] = useState<'dia' | 'semana' | 'mes'>('dia');
+  const [granularidade, setGranularidade] = useState<'dia' | 'semana' | 'mes'>('semana');
 
   useEffect(() => {
     let mounted = true;
@@ -128,7 +128,7 @@ const PlataformasDashboard: React.FC = () => {
         value: `${marketShare.toFixed(1)}%`,
         change: undefined,
         icon: <FiTrendingUp />,
-        color: 'blue' as const,
+        color: 'orange' as const,
         description: 'Porcentagem da receita total que a plataforma líder representa'
       });
     }
