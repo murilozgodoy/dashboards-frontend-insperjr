@@ -1,5 +1,6 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { CHART_COLORS } from '../config/colors';
 
 interface WaterfallData {
   receita_bruta: number;
@@ -21,22 +22,22 @@ const WaterfallChart: React.FC<Props> = ({ data }) => {
     {
       name: 'Receita\nBruta',
       value: data.receita_bruta,
-      color: '#22c55e'
+      color: CHART_COLORS.azul
     },
     {
-      name: 'Menos\niFood',
+      name: 'iFood',
       value: -Math.abs(data.menos_comissao_ifood), // Negativo para ir para baixo
       color: '#ef4444'
     },
     {
-      name: 'Menos\nRappi',
+      name: 'Rappi',
       value: -Math.abs(data.menos_comissao_rappi), // Negativo para ir para baixo
       color: '#ef4444'
     },
     {
       name: 'Receita\nLíquida',
       value: data.receita_liquida_final,
-      color: '#3b82f6'
+      color: CHART_COLORS.azul
     }
   ];
 
